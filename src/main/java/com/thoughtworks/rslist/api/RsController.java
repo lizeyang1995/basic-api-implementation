@@ -9,9 +9,9 @@ import java.util.List;
 
 @RestController
 public class RsController {
-  private List<RsEvent> rsList = initRsEventList();
+  private List<RsEvent> rsList = initRsEvent();
 
-  private List<RsEvent> initRsEventList() {
+  private List<RsEvent> initRsEvent() {
     List<RsEvent> rsEventList = new ArrayList<>();
     rsEventList.add(new RsEvent("第一条事件", "无标签"));
     rsEventList.add(new RsEvent("第二条事件", "无标签"));
@@ -19,22 +19,38 @@ public class RsController {
     return rsEventList;
   }
 
-
   @GetMapping("/rs/{index}")
-  public RsEvent getOneRsEvent(@PathVariable int index) {
+  RsEvent getOneRsEvent(@PathVariable int index) {
     return rsList.get(index - 1);
   }
 
   @GetMapping("/rs/list")
-  public List<RsEvent> getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
-    if (start == null && end == null) {
-      return rsList;
-    }
-    return rsList.subList(start - 1, end);
+  List<RsEvent> getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
+      if (start == null && end == null) {
+          return rsList;
+      }
+      return rsList.subList(start - 1, end);
   }
 
   @PostMapping("/rs/event")
-  public void addRsEvent(@RequestBody RsEvent rsEvent) {
-    rsList.add(rsEvent);
+  void addRsEvent(@RequestBody RsEvent rsEvent) {
+      rsList.add(rsEvent);
+  }
+
+  @PostMapping("/rs/event/{index}")
+  void addRsEvent(@RequestBody RsEvent rsEvent, @PathVariable int index) {
+      String eventName = rsEvent.getEventName();
+      String keyWord = rsEvent.getKeyWord();
+      if (eventName != null) {
+          rsList.get(index - 1).setEventName(eventName);
+      }
+      if (keyWord != null) {
+          rsList.get(index - 1).setKeyWord(keyWord);
+      }
+  }
+
+  @DeleteMapping("/rs/list/delete/{index}")
+  void deleteRsEvent(@PathVariable int index) {
+      rsList.remove(index - 1);
   }
 }
