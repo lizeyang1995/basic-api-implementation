@@ -39,7 +39,7 @@ public class RsControllerTest {
 
     @Test
     public void should_add_rs_event() throws Exception {
-        String jsonString = "{\"eventName\":\"猪肉涨价了\", \"keyWord\",\"经济\"}";
+        String jsonString = "{\"eventName\":\"猪肉涨价了\", \"keyWord\":\"经济\"}";
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list"))
