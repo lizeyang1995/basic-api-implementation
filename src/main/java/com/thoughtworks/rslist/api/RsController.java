@@ -37,8 +37,15 @@ public class RsController {
       rsList.add(rsEvent);
   }
 
-    @PostMapping("/rs/event/{index}")
-    void addRsEvent(@RequestBody RsEvent rsEvent, @PathVariable int index) {
-        rsList.get(index - 1).setEventName(rsEvent.getEventName());
-    }
+  @PostMapping("/rs/event/{index}")
+  void addRsEvent(@RequestBody RsEvent rsEvent, @PathVariable int index) {
+      String eventName = rsEvent.getEventName();
+      String keyWord = rsEvent.getKeyWord();
+      if (eventName != null) {
+          rsList.get(index - 1).setEventName(eventName);
+      }
+      if (keyWord != null) {
+          rsList.get(index - 1).setKeyWord(keyWord);
+      }
+  }
 }
