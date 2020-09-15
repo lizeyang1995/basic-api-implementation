@@ -1,4 +1,4 @@
-package com.thoughtworks.rslist;
+package com.thoughtworks.rslist.api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +12,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class RsListApplicationTests {
+public class RsControllerTest {
 
     @Autowired
     MockMvc mockMvc;
 
     @Test
     void contextLoads() throws Exception {
+        mockMvc.perform(get("/rs/list"))
+                .andExpect(content().string("[第一条事件, 第二条事件, 第三条事件]"))
+                .andExpect(status().isOk());
     }
 }
