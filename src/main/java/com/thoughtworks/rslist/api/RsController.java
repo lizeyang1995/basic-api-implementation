@@ -2,6 +2,9 @@ package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.exception.Error;
+import com.thoughtworks.rslist.exception.RequestParamNotValid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -37,6 +40,9 @@ public class RsController {
   List<RsEvent> getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
       if (start == null && end == null) {
           return rsList;
+      }
+      if (start < 1 || start > rsList.size() || end < 1 || end > rsList.size()) {
+          throw new RequestParamNotValid("invalid request param");
       }
       return rsList.subList(start - 1, end);
   }
@@ -82,5 +88,12 @@ public class RsController {
   @GetMapping("/user/list")
   List<User> getUserList() {
         return userList;
+  }
+
+  @ExceptionHandler(RequestParamNotValid.class)
+  public ResponseEntity rsExceptionHandler(RequestParamNotValid paramNotValidError) {
+      Error error = new Error();
+      error.setError(paramNotValidError.getMessage());
+      return ResponseEntity.badRequest().body(error);
   }
 }
