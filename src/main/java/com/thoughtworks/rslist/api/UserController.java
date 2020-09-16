@@ -41,6 +41,7 @@ public class UserController {
     @GetMapping("/users")
     public ResponseEntity getAllUsers() {
         return ResponseEntity.ok(userList);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity rsExceptionHandler(Exception paramNotValidError) {

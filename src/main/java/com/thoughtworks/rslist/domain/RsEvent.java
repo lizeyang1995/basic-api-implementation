@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 public class RsEvent {

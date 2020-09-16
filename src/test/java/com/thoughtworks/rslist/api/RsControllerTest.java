@@ -208,9 +208,10 @@ public class RsControllerTest {
                 .andExpect(jsonPath("$.eventName", is("第一条事件")))
                 .andExpect(jsonPath("$", not(hasKey("user"))))
                 .andExpect(status().isOk());
+    }
 
-        @Test
-        @Order(12)
+    @Test
+    @Order(12)
     public void should_throw_when_start_or_end_out_of_range() throws Exception {
         mockMvc.perform(get("/rs/list?start=0&end=2"))
                 .andExpect(status().isBadRequest())
@@ -225,9 +226,10 @@ public class RsControllerTest {
                 .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
                 .andExpect(jsonPath("$", not(hasKey("user"))))
                 .andExpect(status().isOk());
+    }
 
-            @Test
-            @Order(14)
+    @Test
+    @Order(14)
     public void should_throw_when_rs_index_out_of_range() throws Exception {
         mockMvc.perform(get("/rs/0"))
                 .andExpect(status().isBadRequest())

@@ -107,9 +107,10 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$[0].user_email", is("a@b.com")))
                 .andExpect(jsonPath("$[0].user_phone", is("10000000000")))
                 .andExpect(status().isOk());
+    }
 
-        @Test
-        @Order(7)
+    @Test
+    @Order(7)
     public void should_throw_when_user_argument_invalid() throws Exception {
         User user = new User("lizezzzzz", null, 18, "ab.com", "10000000000");
         ObjectMapper objectMapper = new ObjectMapper();
