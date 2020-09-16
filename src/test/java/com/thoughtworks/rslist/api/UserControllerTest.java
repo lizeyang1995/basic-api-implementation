@@ -1,6 +1,5 @@
 package com.thoughtworks.rslist.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.User;
 import org.junit.jupiter.api.Test;
@@ -36,7 +35,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].name", is("lize")))
                 .andExpect(jsonPath("$[0].gender", is("male")))
-                .andExpect(jsonPath("$[0].age", is("18")))
+                .andExpect(jsonPath("$[0].age", is(18)))
                 .andExpect(jsonPath("$[0].email", is("a@b.com")))
                 .andExpect(jsonPath("$[0].phoneNumber", is("10000000000")))
                 .andExpect(status().isOk());

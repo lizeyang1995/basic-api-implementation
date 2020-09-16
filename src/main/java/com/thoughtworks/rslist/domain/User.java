@@ -1,9 +1,6 @@
 package com.thoughtworks.rslist.domain;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 public class User {
     @NotNull
@@ -11,8 +8,8 @@ public class User {
     private String name;
     @NotNull
     private String gender;
-    @Size(min = 18)
-    @Size(max = 100)
+    @Min(18)
+    @Max(100)
     private int age;
     @Email
     private String email;
