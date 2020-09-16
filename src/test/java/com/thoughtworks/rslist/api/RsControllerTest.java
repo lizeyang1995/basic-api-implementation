@@ -178,4 +178,15 @@ public class RsControllerTest {
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @Order(10)
+    public void key_word_should_not_null() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
+        RsEvent rsEvent = new RsEvent("早餐", null, user);
+        String jsonString = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 }
