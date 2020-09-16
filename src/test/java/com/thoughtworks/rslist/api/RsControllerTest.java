@@ -1,5 +1,8 @@
 package com.thoughtworks.rslist.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thoughtworks.rslist.domain.RsEvent;
+import com.thoughtworks.rslist.domain.User;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -45,7 +48,10 @@ public class RsControllerTest {
     @Test
     @Order(3)
     public void should_add_rs_event() throws Exception {
-        String jsonString = "{\"eventName\":\"猪肉涨价了\", \"keyWord\":\"经济\"}";
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
+        RsEvent rsEvent = new RsEvent("猪肉涨价了", "经济", user);
+        String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list"))
@@ -64,7 +70,10 @@ public class RsControllerTest {
     @Test
     @Order(4)
     public void should_modify_rs_event_when_provide_event_name() throws Exception {
-        String jsonString = "{\"eventName\":\"学校放假了\"}";
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
+        RsEvent rsEvent = new RsEvent("学校放假了", null, user);
+        String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list"))
@@ -83,7 +92,10 @@ public class RsControllerTest {
     @Test
     @Order(5)
     public void should_modify_rs_event_when_provide_key_word() throws Exception {
-        String jsonString = "{\"keyWord\":\"政策\"}";
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
+        RsEvent rsEvent = new RsEvent(null, "政策", user);
+        String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list"))
@@ -102,7 +114,10 @@ public class RsControllerTest {
     @Test
     @Order(6)
     public void should_modify_rs_event_when_provide_key_word_and_event_name() throws Exception {
-        String jsonString = "{\"eventName\":\"晚餐\", \"keyWord\":\"猪蹄\"}";
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
+        RsEvent rsEvent = new RsEvent("晚餐", "猪蹄", user);
+        String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list"))
