@@ -44,14 +44,18 @@ public class RsController {
   @PostMapping("/rs/event")
   void addRsEvent(@RequestBody @Valid RsEvent rsEvent) {
       String userName = rsEvent.getUser().getUserName();
+      User existingUser = new User();
       boolean notExist = true;
       for (User user : userList) {
         if (user.getUserName().equals(userName)) {
             notExist = false;
+            existingUser = user;
         }
       }
       if (notExist) {
           userList.add(rsEvent.getUser());
+      } else {
+          rsEvent.setUser(existingUser);
       }
       rsList.add(rsEvent);
   }
