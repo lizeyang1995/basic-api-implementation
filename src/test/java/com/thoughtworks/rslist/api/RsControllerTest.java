@@ -72,7 +72,7 @@ public class RsControllerTest {
     public void should_modify_rs_event_when_provide_event_name() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         User user = new User("lize", "male", 18, "a@b.com", "10000000000");
-        RsEvent rsEvent = new RsEvent("学校放假了", null, user);
+        RsEvent rsEvent = new RsEvent("学校放假了", "经济", user);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(patch("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -94,7 +94,7 @@ public class RsControllerTest {
     public void should_modify_rs_event_when_provide_key_word() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         User user = new User("lize", "male", 18, "a@b.com", "10000000000");
-        RsEvent rsEvent = new RsEvent(null, "政策", user);
+        RsEvent rsEvent = new RsEvent("学校放假了", "政策", user);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(patch("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -166,5 +166,16 @@ public class RsControllerTest {
                 .andExpect(jsonPath("$[0].email", is("a@b.com")))
                 .andExpect(jsonPath("$[0].phoneNumber", is("10000000000")))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @Order(9)
+    public void event_name_should_not_null() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
+        RsEvent rsEvent = new RsEvent(null, "稀饭", user);
+        String jsonString = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }

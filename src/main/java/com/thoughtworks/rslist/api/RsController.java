@@ -4,6 +4,7 @@ import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +42,7 @@ public class RsController {
   }
 
   @PostMapping("/rs/event")
-  void addRsEvent(@RequestBody RsEvent rsEvent) {
+  void addRsEvent(@RequestBody @Valid RsEvent rsEvent) {
       String userName = rsEvent.getUser().getName();
       boolean notExist = true;
       for (User user : userList) {
@@ -56,18 +57,14 @@ public class RsController {
   }
 
   @PatchMapping("/rs/event/{index}")
-  void modifyRsEvent(@RequestBody RsEvent rsEvent, @PathVariable int index) {
+  void modifyRsEvent(@RequestBody @Valid RsEvent rsEvent, @PathVariable int index) {
       if (index < 1 || index > rsList.size()) {
           throw new IllegalArgumentException();
       }
       String eventName = rsEvent.getEventName();
       String keyWord = rsEvent.getKeyWord();
-      if (eventName != null) {
-          rsList.get(index - 1).setEventName(eventName);
-      }
-      if (keyWord != null) {
-          rsList.get(index - 1).setKeyWord(keyWord);
-      }
+      rsList.get(index - 1).setEventName(eventName);
+      rsList.get(index - 1).setKeyWord(keyWord);
   }
 
   @DeleteMapping("/rs/list/{index}")

@@ -1,7 +1,11 @@
 package com.thoughtworks.rslist.domain;
 
+import javax.validation.constraints.NotNull;
+
 public class RsEvent {
+    @NotNull
     private String eventName;
+    @NotNull
     private String keyWord;
     private User user;
 
