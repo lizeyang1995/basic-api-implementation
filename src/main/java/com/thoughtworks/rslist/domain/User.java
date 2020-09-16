@@ -5,7 +5,7 @@ import javax.validation.constraints.*;
 public class User {
     @NotNull
     @Size(max = 8)
-    private String name;
+    private String userName;
     @NotNull
     private String gender;
     @Min(18)
@@ -14,26 +14,34 @@ public class User {
     @Email
     private String email;
     @Pattern(regexp = "1\\d{10}")
-    private String phoneNumber;
+    private String phone;
     private int voteNumber = 10;
 
-    public User(String name, String gender, int age, String email, String phoneNumber) {
-        this.name = name;
+    public User(String userName, String gender, int age, String email, String phone) {
+        this.userName = userName;
         this.gender = gender;
         this.age = age;
         this.email = email;
-        this.phoneNumber = phoneNumber;
+        this.phone = phone;
     }
 
     public User() {
     }
 
-    public String getName() {
-        return name;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getGender() {
@@ -58,14 +66,6 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
     }
 
     public int getVoteNumber() {
