@@ -20,13 +20,12 @@ public class User {
     private String phoneNumber;
     private int voteNumber = 10;
 
-    public User(String name, String gender, int age, String email, String phoneNumber, int voteNumber) {
+    public User(String name, String gender, int age, String email, String phoneNumber) {
         this.name = name;
         this.gender = gender;
         this.age = age;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.voteNumber = voteNumber;
     }
 
     public User() {
