@@ -197,4 +197,13 @@ public class RsControllerTest {
                 .andExpect(jsonPath("$", not(hasKey("user"))))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @Order(12)
+    public void should_not_include_user_field_in_rs_list() throws Exception {
+        mockMvc.perform(get("/rs/list"))
+                .andExpect(jsonPath("$.eventName", is("第一条事件")))
+                .andExpect(jsonPath("$", not(hasKey("user"))))
+                .andExpect(status().isOk());
+    }
 }
