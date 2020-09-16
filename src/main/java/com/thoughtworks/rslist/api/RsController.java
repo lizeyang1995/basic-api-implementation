@@ -33,7 +33,10 @@ public class RsController {
 
   @GetMapping("/rs/{index}")
   RsEvent getOneRsEvent(@PathVariable int index) {
-    return rsList.get(index - 1);
+      if (index < 1 || index > rsList.size()) {
+          throw new RequestParamNotValid("invalid index");
+      }
+      return rsList.get(index - 1);
   }
 
   @GetMapping("/rs/list")
