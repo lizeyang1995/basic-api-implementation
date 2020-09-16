@@ -202,7 +202,7 @@ public class RsControllerTest {
     @Order(12)
     public void should_not_include_user_field_in_rs_list() throws Exception {
         mockMvc.perform(get("/rs/list"))
-                .andExpect(jsonPath("$.eventName", is("第一条事件")))
+                .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
                 .andExpect(jsonPath("$", not(hasKey("user"))))
                 .andExpect(status().isOk());
     }

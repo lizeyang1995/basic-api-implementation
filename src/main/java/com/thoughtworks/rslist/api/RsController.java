@@ -37,6 +37,7 @@ public class RsController {
   }
 
   @GetMapping("/rs/list")
+  @JsonView(RsEvent.UserInfo.class)
   ResponseEntity getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
       if (start == null && end == null) {
           return ResponseEntity.ok(rsList);
