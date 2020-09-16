@@ -2,6 +2,7 @@ package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -29,20 +30,20 @@ public class RsController {
   }
 
   @GetMapping("/rs/{index}")
-  RsEvent getOneRsEvent(@PathVariable int index) {
-    return rsList.get(index - 1);
+  ResponseEntity getOneRsEvent(@PathVariable int index) {
+    return ResponseEntity.ok(rsList.get(index - 1));
   }
 
   @GetMapping("/rs/list")
-  List<RsEvent> getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
+  ResponseEntity getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
       if (start == null && end == null) {
-          return rsList;
+          return ResponseEntity.ok(rsList);
       }
-      return rsList.subList(start - 1, end);
+      return ResponseEntity.ok(rsList.subList(start - 1, end));
   }
 
   @PostMapping("/rs/event")
-  void addRsEvent(@RequestBody @Valid RsEvent rsEvent) {
+  ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent) {
       String userName = rsEvent.getUser().getUserName();
       boolean notExist = true;
       for (User user : userList) {
@@ -54,10 +55,11 @@ public class RsController {
           userList.add(rsEvent.getUser());
       }
       rsList.add(rsEvent);
+      return ResponseEntity.created(null).build();
   }
 
   @PatchMapping("/rs/event/{index}")
-  void modifyRsEvent(@RequestBody @Valid RsEvent rsEvent, @PathVariable int index) {
+  ResponseEntity modifyRsEvent(@RequestBody @Valid RsEvent rsEvent, @PathVariable int index) {
       if (index < 1 || index > rsList.size()) {
           throw new IllegalArgumentException();
       }
@@ -65,18 +67,20 @@ public class RsController {
       String keyWord = rsEvent.getKeyWord();
       rsList.get(index - 1).setEventName(eventName);
       rsList.get(index - 1).setKeyWord(keyWord);
+      return ResponseEntity.created(null).build();
   }
 
   @DeleteMapping("/rs/list/{index}")
-  void deleteRsEvent(@PathVariable int index) {
+  ResponseEntity deleteRsEvent(@PathVariable int index) {
       if (index < 1 || index > rsList.size()) {
           throw new IllegalArgumentException();
       }
       rsList.remove(index - 1);
+      return ResponseEntity.created(null).build();
   }
 
   @GetMapping("/user/list")
-  List<User> getUserList() {
-        return userList;
+  ResponseEntity getUserList() {
+        return ResponseEntity.ok(userList);
   }
 }
