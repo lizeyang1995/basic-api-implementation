@@ -55,7 +55,8 @@ public class RsController {
           userList.add(rsEvent.getUser());
       }
       rsList.add(rsEvent);
-      return ResponseEntity.created(null).build();
+      int eventIndex = rsList.size() - 1;
+      return ResponseEntity.created(null).body(eventIndex);
   }
 
   @PatchMapping("/rs/event/{index}")
