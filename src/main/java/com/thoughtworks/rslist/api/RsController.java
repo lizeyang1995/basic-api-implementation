@@ -1,8 +1,15 @@
 package com.thoughtworks.rslist.api;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.exception.Error;
+import com.thoughtworks.rslist.exception.RequestParamNotValid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
+import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +22,7 @@ import java.util.List;
 public class RsController {
   private List<RsEvent> rsList = initRsEvent();
   private List<User> userList = initUserList();
+    Logger logger = LoggerFactory.getLogger(getClass());
 
     private List<User> initUserList() {
         userList = new ArrayList<>();
@@ -33,6 +41,9 @@ public class RsController {
   @GetMapping("/rs/{index}")
   @JsonView(RsEvent.UserInfo.class)
   ResponseEntity getOneRsEvent(@PathVariable int index) {
+      if (index < 1 || index > rsList.size()) {
+          throw new RequestParamNotValid("invalid index");
+      }
     return ResponseEntity.ok(rsList.get(index - 1));
   }
 
@@ -41,6 +52,9 @@ public class RsController {
   ResponseEntity getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
       if (start == null && end == null) {
           return ResponseEntity.ok(rsList);
+      }
+      if (start < 1 || start > rsList.size() || end < 1 || end > rsList.size()) {
+          throw new RequestParamNotValid("invalid request param");
       }
       return ResponseEntity.ok(rsList.subList(start - 1, end));
   }
@@ -91,4 +105,18 @@ public class RsController {
   ResponseEntity getUserList() {
         return ResponseEntity.ok(userList);
   }
+
+    @ExceptionHandler({RequestParamNotValid.class, MethodArgumentNotValidException.class})
+    public ResponseEntity rsExceptionHandler(Exception paramNotValidError) {
+        String errorMessage;
+        if (paramNotValidError instanceof MethodArgumentNotValidException) {
+            errorMessage = "invalid param";
+        } else {
+            errorMessage = paramNotValidError.getMessage();
+        }
+        Error error = new Error();
+        error.setError(errorMessage);
+        logger.error(errorMessage);
+        return ResponseEntity.badRequest().body(error);
+    }
 }

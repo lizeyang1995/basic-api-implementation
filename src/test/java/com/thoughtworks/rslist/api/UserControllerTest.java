@@ -35,6 +35,7 @@ public class UserControllerTest {
         String jsonString = objectMapper.writeValueAsString(user);
 
         mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+
                 .andExpect(status().isCreated());
     }
 
@@ -86,6 +87,7 @@ public class UserControllerTest {
     @Order(5)
     public void gender_should_not_null() throws Exception {
         User user = new User("lize", null, 18, "a@b.com", "10000000000");
+
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonString = objectMapper.writeValueAsString(user);
 
@@ -105,5 +107,17 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$[0].user_email", is("a@b.com")))
                 .andExpect(jsonPath("$[0].user_phone", is("10000000000")))
                 .andExpect(status().isOk());
+
+        @Test
+        @Order(7)
+    public void should_throw_when_user_argument_invalid() throws Exception {
+        User user = new User("lizezzzzz", null, 18, "ab.com", "10000000000");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = objectMapper.writeValueAsString(user);
+
+        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error", is("invalid user")));
+
     }
 }
