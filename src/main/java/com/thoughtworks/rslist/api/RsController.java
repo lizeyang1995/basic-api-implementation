@@ -4,6 +4,8 @@ import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.exception.Error;
 import com.thoughtworks.rslist.exception.RequestParamNotValid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +17,9 @@ import java.util.List;
 
 @RestController
 public class RsController {
-  private List<RsEvent> rsList = initRsEvent();
-  private List<User> userList = initUserList();
+    private List<RsEvent> rsList = initRsEvent();
+    private List<User> userList = initUserList();
+    Logger logger = LoggerFactory.getLogger(getClass());
 
     private List<User> initUserList() {
         userList = new ArrayList<>();
@@ -104,6 +107,7 @@ public class RsController {
         }
         Error error = new Error();
         error.setError(errorMessage);
+        logger.error(errorMessage);
         return ResponseEntity.badRequest().body(error);
   }
 }
