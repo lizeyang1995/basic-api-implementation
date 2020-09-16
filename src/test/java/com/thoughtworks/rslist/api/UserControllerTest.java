@@ -38,11 +38,11 @@ public class UserControllerTest {
                 .andExpect(status().isOk());
         mockMvc.perform(get("/user"))
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].name", is("lize")))
+                .andExpect(jsonPath("$[0].userName", is("lize")))
                 .andExpect(jsonPath("$[0].gender", is("male")))
                 .andExpect(jsonPath("$[0].age", is(18)))
                 .andExpect(jsonPath("$[0].email", is("a@b.com")))
-                .andExpect(jsonPath("$[0].phoneNumber", is("10000000000")))
+                .andExpect(jsonPath("$[0].phone", is("10000000000")))
                 .andExpect(status().isOk());
     }
 
@@ -83,6 +83,17 @@ public class UserControllerTest {
     @Order(4)
     public void email_should_suit_format() throws Exception {
         User user = new User("lize", "male", 18, "ab.com", "10000000000");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = objectMapper.writeValueAsString(user);
+
+        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Order(5)
+    public void gender_should_not_null() throws Exception {
+        User user = new User("lize", null, 18, "ab.com", "10000000000");
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonString = objectMapper.writeValueAsString(user);
 

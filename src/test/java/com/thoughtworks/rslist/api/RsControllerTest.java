@@ -1,5 +1,8 @@
 package com.thoughtworks.rslist.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thoughtworks.rslist.domain.RsEvent;
+import com.thoughtworks.rslist.domain.User;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -45,7 +48,10 @@ public class RsControllerTest {
     @Test
     @Order(3)
     public void should_add_rs_event() throws Exception {
-        String jsonString = "{\"eventName\":\"猪肉涨价了\", \"keyWord\":\"经济\"}";
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
+        RsEvent rsEvent = new RsEvent("猪肉涨价了", "经济", user);
+        String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list"))
@@ -64,8 +70,11 @@ public class RsControllerTest {
     @Test
     @Order(4)
     public void should_modify_rs_event_when_provide_event_name() throws Exception {
-        String jsonString = "{\"eventName\":\"学校放假了\"}";
-        mockMvc.perform(post("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
+        RsEvent rsEvent = new RsEvent("学校放假了", "经济", user);
+        String jsonString = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(patch("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$", hasSize(4)))
@@ -83,8 +92,11 @@ public class RsControllerTest {
     @Test
     @Order(5)
     public void should_modify_rs_event_when_provide_key_word() throws Exception {
-        String jsonString = "{\"keyWord\":\"政策\"}";
-        mockMvc.perform(post("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
+        RsEvent rsEvent = new RsEvent("学校放假了", "政策", user);
+        String jsonString = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(patch("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$", hasSize(4)))
@@ -102,8 +114,11 @@ public class RsControllerTest {
     @Test
     @Order(6)
     public void should_modify_rs_event_when_provide_key_word_and_event_name() throws Exception {
-        String jsonString = "{\"eventName\":\"晚餐\", \"keyWord\":\"猪蹄\"}";
-        mockMvc.perform(post("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
+        RsEvent rsEvent = new RsEvent("晚餐", "猪蹄", user);
+        String jsonString = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(patch("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$", hasSize(4)))
@@ -121,7 +136,7 @@ public class RsControllerTest {
     @Test
     @Order(7)
     public void should_delete_rs_event() throws Exception {
-        mockMvc.perform(delete("/rs/list/delete/4"))
+        mockMvc.perform(delete("/rs/list/4"))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$", hasSize(3)))
@@ -132,5 +147,46 @@ public class RsControllerTest {
                 .andExpect(jsonPath("$[2].eventName", is("第三条事件")))
                 .andExpect(jsonPath("$[2].keyWord", is("无标签")))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @Order(8)
+    public void should_not_add_user_in_user_list_if_user_name_exists() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
+        RsEvent rsEvent = new RsEvent("早餐", "稀饭", user);
+        String jsonString = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/user/list"))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].userName", is("lize")))
+                .andExpect(jsonPath("$[0].gender", is("male")))
+                .andExpect(jsonPath("$[0].age", is(18)))
+                .andExpect(jsonPath("$[0].email", is("a@b.com")))
+                .andExpect(jsonPath("$[0].phone", is("10000000000")))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @Order(9)
+    public void event_name_should_not_null() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
+        RsEvent rsEvent = new RsEvent(null, "稀饭", user);
+        String jsonString = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Order(10)
+    public void key_word_should_not_null() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
+        RsEvent rsEvent = new RsEvent("早餐", null, user);
+        String jsonString = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }
