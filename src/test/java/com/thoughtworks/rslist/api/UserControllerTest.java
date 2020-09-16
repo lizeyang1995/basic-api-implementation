@@ -2,7 +2,10 @@ package com.thoughtworks.rslist.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.User;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,12 +21,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserControllerTest {
 
     @Autowired
     MockMvc mockMvc;
 
     @Test
+    @Order(1)
     public void should_add_a_user() throws Exception {
         User user = new User("lize", "male", 18, "a@b.com", "10000000000");
         ObjectMapper objectMapper = new ObjectMapper();
@@ -39,5 +44,16 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$[0].email", is("a@b.com")))
                 .andExpect(jsonPath("$[0].phoneNumber", is("10000000000")))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @Order(2)
+    public void name_should_less_than_8() throws Exception {
+        User user = new User("lizezzzzz", "male", 18, "a@b.com", "10000000000");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = objectMapper.writeValueAsString(user);
+
+        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }
