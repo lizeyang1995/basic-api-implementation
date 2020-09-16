@@ -1,12 +1,21 @@
 package com.thoughtworks.rslist.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+
 import javax.validation.constraints.NotNull;
 
 public class RsEvent {
+    public interface UserInfo{};
+    public interface UserDetail extends UserInfo{};
     @NotNull
+    @JsonView(UserInfo.class)
     private String eventName;
     @NotNull
+    @JsonView(UserInfo.class)
     private String keyWord;
+    @JsonView(UserDetail.class)
     private User user;
 
     public RsEvent(String eventName, String keyWord, User user) {

@@ -13,8 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -53,7 +52,7 @@ public class RsControllerTest {
         RsEvent rsEvent = new RsEvent("猪肉涨价了", "经济", user);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$", hasSize(4)))
                 .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
@@ -75,7 +74,7 @@ public class RsControllerTest {
         RsEvent rsEvent = new RsEvent("学校放假了", "经济", user);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(patch("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$", hasSize(4)))
                 .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
@@ -97,7 +96,7 @@ public class RsControllerTest {
         RsEvent rsEvent = new RsEvent("学校放假了", "政策", user);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(patch("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$", hasSize(4)))
                 .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
@@ -119,7 +118,7 @@ public class RsControllerTest {
         RsEvent rsEvent = new RsEvent("晚餐", "猪蹄", user);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(patch("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$", hasSize(4)))
                 .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
@@ -137,7 +136,7 @@ public class RsControllerTest {
     @Order(7)
     public void should_delete_rs_event() throws Exception {
         mockMvc.perform(delete("/rs/list/4"))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$", hasSize(3)))
                 .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
@@ -157,14 +156,14 @@ public class RsControllerTest {
         RsEvent rsEvent = new RsEvent("早餐", "稀饭", user);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         mockMvc.perform(get("/user/list"))
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].userName", is("lize")))
-                .andExpect(jsonPath("$[0].gender", is("male")))
-                .andExpect(jsonPath("$[0].age", is(18)))
-                .andExpect(jsonPath("$[0].email", is("a@b.com")))
-                .andExpect(jsonPath("$[0].phone", is("10000000000")))
+                .andExpect(jsonPath("$[0].user_name", is("lize")))
+                .andExpect(jsonPath("$[0].user_gender", is("male")))
+                .andExpect(jsonPath("$[0].user_age", is(18)))
+                .andExpect(jsonPath("$[0].user_email", is("a@b.com")))
+                .andExpect(jsonPath("$[0].user_phone", is("10000000000")))
                 .andExpect(status().isOk());
     }
 
@@ -188,5 +187,23 @@ public class RsControllerTest {
         String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Order(11)
+    public void should_not_include_user_field_in_rs_index() throws Exception {
+        mockMvc.perform(get("/rs/1"))
+                .andExpect(jsonPath("$.eventName", is("第一条事件")))
+                .andExpect(jsonPath("$", not(hasKey("user"))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @Order(12)
+    public void should_not_include_user_field_in_rs_list() throws Exception {
+        mockMvc.perform(get("/rs/list"))
+                .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
+                .andExpect(jsonPath("$", not(hasKey("user"))))
+                .andExpect(status().isOk());
     }
 }

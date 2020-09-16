@@ -35,15 +35,7 @@ public class UserControllerTest {
         String jsonString = objectMapper.writeValueAsString(user);
 
         mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-        mockMvc.perform(get("/user"))
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].userName", is("lize")))
-                .andExpect(jsonPath("$[0].gender", is("male")))
-                .andExpect(jsonPath("$[0].age", is(18)))
-                .andExpect(jsonPath("$[0].email", is("a@b.com")))
-                .andExpect(jsonPath("$[0].phone", is("10000000000")))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -93,11 +85,25 @@ public class UserControllerTest {
     @Test
     @Order(5)
     public void gender_should_not_null() throws Exception {
-        User user = new User("lize", null, 18, "ab.com", "10000000000");
+        User user = new User("lize", null, 18, "a@b.com", "10000000000");
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonString = objectMapper.writeValueAsString(user);
 
         mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Order(6)
+    public void should_get_all_users() throws Exception {
+
+        mockMvc.perform(get("/users"))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].user_name", is("lize")))
+                .andExpect(jsonPath("$[0].user_age", is(18)))
+                .andExpect(jsonPath("$[0].user_gender", is("male")))
+                .andExpect(jsonPath("$[0].user_email", is("a@b.com")))
+                .andExpect(jsonPath("$[0].user_phone", is("10000000000")))
+                .andExpect(status().isOk());
     }
 }
