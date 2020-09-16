@@ -136,7 +136,7 @@ public class RsControllerTest {
     @Test
     @Order(7)
     public void should_delete_rs_event() throws Exception {
-        mockMvc.perform(delete("/rs/list/delete/4"))
+        mockMvc.perform(delete("/rs/list/4"))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$", hasSize(3)))
