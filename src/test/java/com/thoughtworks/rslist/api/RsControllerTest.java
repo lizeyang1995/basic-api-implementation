@@ -74,7 +74,7 @@ public class RsControllerTest {
         User user = new User("lize", "male", 18, "a@b.com", "10000000000");
         RsEvent rsEvent = new RsEvent("学校放假了", null, user);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
-        mockMvc.perform(post("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(patch("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$", hasSize(4)))
@@ -96,7 +96,7 @@ public class RsControllerTest {
         User user = new User("lize", "male", 18, "a@b.com", "10000000000");
         RsEvent rsEvent = new RsEvent(null, "政策", user);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
-        mockMvc.perform(post("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(patch("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$", hasSize(4)))
@@ -118,7 +118,7 @@ public class RsControllerTest {
         User user = new User("lize", "male", 18, "a@b.com", "10000000000");
         RsEvent rsEvent = new RsEvent("晚餐", "猪蹄", user);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
-        mockMvc.perform(post("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(patch("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$", hasSize(4)))
