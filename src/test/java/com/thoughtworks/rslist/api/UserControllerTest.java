@@ -67,4 +67,15 @@ public class UserControllerTest {
         mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @Order(4)
+    public void phone_number_should_less_than_11() throws Exception {
+        User user = new User("lize", "male", 18, "a@b.com", "100000000001");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = objectMapper.writeValueAsString(user);
+
+        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 }
