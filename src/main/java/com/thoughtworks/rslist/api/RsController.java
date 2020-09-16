@@ -1,5 +1,6 @@
 package com.thoughtworks.rslist.api;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,7 @@ public class RsController {
   }
 
   @GetMapping("/rs/{index}")
+  @JsonView(RsEvent.UserInfo.class)
   ResponseEntity getOneRsEvent(@PathVariable int index) {
     return ResponseEntity.ok(rsList.get(index - 1));
   }
