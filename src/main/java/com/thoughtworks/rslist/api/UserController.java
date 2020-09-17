@@ -77,10 +77,14 @@ public class UserController {
         throw new IllegalArgumentException();
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler({MethodArgumentNotValidException.class, IllegalArgumentException.class})
     public ResponseEntity rsExceptionHandler(Exception paramNotValidError) {
         String errorMessage;
-        errorMessage = "invalid user";
+        if (paramNotValidError instanceof MethodArgumentNotValidException) {
+            errorMessage = "invalid user";
+        } else {
+            errorMessage = "invalid id";
+        }
         Error error = new Error();
         error.setError(errorMessage);
         logger.error(errorMessage);
