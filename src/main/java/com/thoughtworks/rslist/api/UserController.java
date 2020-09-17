@@ -53,8 +53,8 @@ public class UserController {
 
     @GetMapping("/users")
     public ResponseEntity getAllUsers() {
-
-        return ResponseEntity.ok(userList);
+        List<UserPO> allUsers = userRepository.findAll();
+        return ResponseEntity.ok(allUsers);
     }
 
     @GetMapping("/users/{index}")
