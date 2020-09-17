@@ -3,6 +3,10 @@ package com.thoughtworks.rslist.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.po.RsEventPO;
+import com.thoughtworks.rslist.po.UserPO;
+import com.thoughtworks.rslist.repository.RsEventRepository;
+import com.thoughtworks.rslist.repository.UserRepository;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -13,7 +17,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -24,6 +32,10 @@ public class RsControllerTest {
 
     @Autowired
     MockMvc mockMvc;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    RsEventRepository rsEventRepository;
 
     @Test
     @Order(1)
@@ -46,25 +58,18 @@ public class RsControllerTest {
 
     @Test
     @Order(3)
-    public void should_add_rs_event() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
-        RsEvent rsEvent = new RsEvent("猪肉涨价了", "经济", user);
-        String jsonString = objectMapper.writeValueAsString(rsEvent);
+    public void should_add_rs_event_when_user_exist() throws Exception {
+        UserPO savedOneUser = userRepository.save(UserPO.builder().userName("lize").gender("male").age(18).email("a@b.com").phone("10000000000").voteNumber(10).build());
+        String jsonString = "{\"eventName\":\"猪肉涨价了\", \"keyWord\":\"经济\", \"userId\":" + savedOneUser.getId() + "}";
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("index", "3"));
-        mockMvc.perform(get("/rs/list"))
-                .andExpect(jsonPath("$", hasSize(4)))
-                .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
-                .andExpect(jsonPath("$[0].keyWord", is("无标签")))
-                .andExpect(jsonPath("$[1].eventName", is("第二条事件")))
-                .andExpect(jsonPath("$[1].keyWord", is("无标签")))
-                .andExpect(jsonPath("$[2].eventName", is("第三条事件")))
-                .andExpect(jsonPath("$[2].keyWord", is("无标签")))
-                .andExpect(jsonPath("$[3].eventName", is("猪肉涨价了")))
-                .andExpect(jsonPath("$[3].keyWord", is("经济")))
-                .andExpect(status().isOk());
+        List<RsEventPO> allRsEvents = rsEventRepository.findAll();
+        assertNotNull(allRsEvents);
+        assertEquals(1, allRsEvents.size());
+        assertEquals("猪肉涨价了", allRsEvents.get(0).getEventName());
+        assertEquals("经济", allRsEvents.get(0).getKeyWord());
+        assertEquals(savedOneUser.getId(), allRsEvents.get(0).getUserId());
     }
 
     @Test
