@@ -54,6 +54,7 @@ public class RsController {
         if (user.getUserName().equals(userName)) {
             notExist = false;
             existingUser = user;
+            break;
         }
       }
       if (notExist) {
@@ -63,7 +64,7 @@ public class RsController {
       }
       rsList.add(rsEvent);
       int eventIndex = rsList.size() - 1;
-      return ResponseEntity.created(null).body(eventIndex);
+      return ResponseEntity.created(null).header("index", Integer.toString(eventIndex)).build();
   }
 
   @PatchMapping("/rs/event/{index}")
