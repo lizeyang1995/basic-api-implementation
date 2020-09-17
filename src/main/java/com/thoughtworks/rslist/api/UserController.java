@@ -21,7 +21,6 @@ import java.util.List;
 @RestController
 public class UserController {
     List<User> userList = initUserList();
-
     Logger logger = LoggerFactory.getLogger(getClass());
 
 

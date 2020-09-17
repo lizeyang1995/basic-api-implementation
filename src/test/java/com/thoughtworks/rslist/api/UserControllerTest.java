@@ -87,7 +87,6 @@ public class UserControllerTest {
     @Order(5)
     public void gender_should_not_null() throws Exception {
         User user = new User("lize", null, 18, "a@b.com", "10000000000");
-
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonString = objectMapper.writeValueAsString(user);
 
@@ -98,7 +97,6 @@ public class UserControllerTest {
     @Test
     @Order(6)
     public void should_get_all_users() throws Exception {
-
         mockMvc.perform(get("/users"))
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].user_name", is("lize")))
