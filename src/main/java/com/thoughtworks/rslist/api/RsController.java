@@ -4,8 +4,13 @@ import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.exception.Error;
 import com.thoughtworks.rslist.exception.RequestParamNotValid;
+import com.thoughtworks.rslist.po.RsEventPO;
+import com.thoughtworks.rslist.po.UserPO;
+import com.thoughtworks.rslist.repository.RsEventRepository;
+import com.thoughtworks.rslist.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +28,10 @@ public class RsController {
     private List<RsEvent> rsList = initRsEvent();
     private List<User> userList = initUserList();
     Logger logger = LoggerFactory.getLogger(getClass());
+    @Autowired
+    RsEventRepository rsEventRepository;
+    @Autowired
+    UserRepository userRepository;
 
     private List<User> initUserList() {
         userList = new ArrayList<>();
@@ -32,9 +41,9 @@ public class RsController {
     private List<RsEvent> initRsEvent() {
         List<RsEvent> rsEventList = new ArrayList<>();
         User user = new User("lize", "male", 18, "a@b.com", "10000000000");
-        rsEventList.add(new RsEvent("第一条事件", "无标签", user));
-        rsEventList.add(new RsEvent("第二条事件", "无标签", user));
-        rsEventList.add(new RsEvent("第三条事件", "无标签", user));
+        rsEventList.add(new RsEvent("第一条事件", "无标签", 1));
+        rsEventList.add(new RsEvent("第二条事件", "无标签", 1));
+        rsEventList.add(new RsEvent("第三条事件", "无标签", 1));
         return rsEventList;
     }
 
@@ -61,22 +70,20 @@ public class RsController {
 
   @PostMapping("/rs/event")
   ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent) {
-      String userName = rsEvent.getUser().getUserName();
-      User existingUser = new User();
-      boolean isExist = false;
-      for (User user : userList) {
-        if (user.getUserName().equals(userName)) {
-            isExist = true;
-            existingUser = user;
-            break;
-        }
+      int userId = rsEvent.getUserId();
+      RsEventPO rsEventPO = RsEventPO.builder().eventName(rsEvent.getEventName()).keyWord(rsEvent.getKeyWord()).userId(userId).build();
+      UserPO newUserPO = userRepository.findUserNameById(userId);
+      List<UserPO> usersPO = userRepository.findByUserName(newUserPO.getUserName());
+      if (usersPO.size() > 1) {
+          for (UserPO userPO : usersPO) {
+              int userIdInRepository = userPO.getId();
+              if (userIdInRepository != userId) {
+                  userId = userIdInRepository;
+              }
+          }
       }
-      if (isExist) {
-          rsEvent.setUser(existingUser);
-      } else {
-          userList.add(rsEvent.getUser());
-      }
-      rsList.add(rsEvent);
+      rsEventPO.setUserId(userId);
+      rsEventRepository.save(rsEventPO);
       int eventIndex = rsList.size() - 1;
       return ResponseEntity.created(null).header("index", Integer.toString(eventIndex)).build();
   }
