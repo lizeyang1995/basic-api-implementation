@@ -52,8 +52,8 @@ public class RsControllerTest {
         RsEvent rsEvent = new RsEvent("猪肉涨价了", "经济", user);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
-
+                .andExpect(status().isCreated())
+                .andExpect(header().string("index", "3"));
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$", hasSize(4)))
                 .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
@@ -75,7 +75,6 @@ public class RsControllerTest {
         RsEvent rsEvent = new RsEvent("学校放假了", "经济", user);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(patch("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-
                 .andExpect(status().isCreated());
 
         mockMvc.perform(get("/rs/list"))
@@ -170,7 +169,6 @@ public class RsControllerTest {
                 .andExpect(jsonPath("$[0].user_age", is(18)))
                 .andExpect(jsonPath("$[0].user_email", is("a@b.com")))
                 .andExpect(jsonPath("$[0].user_phone", is("10000000000")))
-
                 .andExpect(status().isOk());
     }
 

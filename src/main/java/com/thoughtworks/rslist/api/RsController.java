@@ -59,26 +59,27 @@ public class RsController {
         return ResponseEntity.ok(rsList.subList(start - 1, end));
     }
 
-    @PostMapping("/rs/event")
-    ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent) {
-        String userName = rsEvent.getUser().getUserName();
-        User existingUser = new User();
-        boolean notExist = true;
-        for (User user : userList) {
-            if (user.getUserName().equals(userName)) {
-                notExist = false;
-                existingUser = user;
-            }
+  @PostMapping("/rs/event")
+  ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent) {
+      String userName = rsEvent.getUser().getUserName();
+      User existingUser = new User();
+      boolean isExist = false;
+      for (User user : userList) {
+        if (user.getUserName().equals(userName)) {
+            isExist = true;
+            existingUser = user;
+            break;
         }
-        if (notExist) {
-            userList.add(rsEvent.getUser());
-        } else {
-            rsEvent.setUser(existingUser);
-        }
-        rsList.add(rsEvent);
-        int eventIndex = rsList.size() - 1;
-        return ResponseEntity.created(null).body(eventIndex);
-    }
+      }
+      if (isExist) {
+          rsEvent.setUser(existingUser);
+      } else {
+          userList.add(rsEvent.getUser());
+      }
+      rsList.add(rsEvent);
+      int eventIndex = rsList.size() - 1;
+      return ResponseEntity.created(null).header("index", Integer.toString(eventIndex)).build();
+  }
 
     @PatchMapping("/rs/event/{index}")
     ResponseEntity modifyRsEvent(@RequestBody @Valid RsEvent rsEvent, @PathVariable int index) {
