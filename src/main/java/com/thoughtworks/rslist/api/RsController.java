@@ -49,18 +49,18 @@ public class RsController {
   ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent) {
       String userName = rsEvent.getUser().getUserName();
       User existingUser = new User();
-      boolean notExist = true;
+      boolean isExist = false;
       for (User user : userList) {
         if (user.getUserName().equals(userName)) {
-            notExist = false;
+            isExist = true;
             existingUser = user;
             break;
         }
       }
-      if (notExist) {
-          userList.add(rsEvent.getUser());
-      } else {
+      if (isExist) {
           rsEvent.setUser(existingUser);
+      } else {
+          userList.add(rsEvent.getUser());
       }
       rsList.add(rsEvent);
       int eventIndex = rsList.size() - 1;
