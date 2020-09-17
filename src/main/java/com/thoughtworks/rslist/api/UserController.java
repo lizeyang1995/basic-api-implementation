@@ -72,6 +72,16 @@ public class UserController {
         throw new IllegalArgumentException();
     }
 
+    @DeleteMapping("/users/{index}")
+    public ResponseEntity deleteUserById(@PathVariable int index) {
+        Optional<UserPO> foundUser = userRepository.findById(index);
+        if (foundUser.isPresent()) {
+            userRepository.deleteById(index);
+            return ResponseEntity.ok(null);
+        }
+        throw new IllegalArgumentException();
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity rsExceptionHandler(Exception paramNotValidError) {
         String errorMessage;

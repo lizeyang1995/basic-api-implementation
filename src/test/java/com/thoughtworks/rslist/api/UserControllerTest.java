@@ -20,8 +20,7 @@ import java.util.Optional;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -144,5 +143,14 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.user_email", is("a@b.com")))
                 .andExpect(jsonPath("$.user_phone", is("10000000000")))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @Order(9)
+    public void should_delete_user_when_given_id() throws Exception {
+        mockMvc.perform(delete("/users/1"))
+                .andExpect(status().isOk());
+        List<UserPO> allUser = userRepository.findAll();
+        assertEquals(0, allUser.size());
     }
 }
