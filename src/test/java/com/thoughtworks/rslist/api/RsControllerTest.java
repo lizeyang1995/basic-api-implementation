@@ -73,6 +73,14 @@ public class RsControllerTest {
     }
 
     @Test
+    @Order(3)
+    public void should_add_rs_event_when_user_not_exist() throws Exception {
+        String jsonString = "{\"eventName\":\"猪肉涨价了\", \"keyWord\":\"经济\", \"userId\":100}";
+        mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @Order(4)
     public void should_modify_rs_event_when_provide_event_name() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();

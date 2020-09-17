@@ -71,6 +71,9 @@ public class RsController {
   @PostMapping("/rs/event")
   ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent) {
       int userId = rsEvent.getUserId();
+      if (!userRepository.findById(userId).isPresent()) {
+          return ResponseEntity.badRequest().build();
+      }
       RsEventPO rsEventPO = RsEventPO.builder().eventName(rsEvent.getEventName()).keyWord(rsEvent.getKeyWord()).userId(userId).build();
       UserPO newUserPO = userRepository.findUserNameById(userId);
       List<UserPO> usersPO = userRepository.findByUserName(newUserPO.getUserName());
