@@ -1,5 +1,7 @@
 package com.thoughtworks.rslist.api;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.po.UserPO;
 import com.thoughtworks.rslist.repository.UserRepository;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class UserController {
@@ -51,6 +54,22 @@ public class UserController {
     @GetMapping("/users")
     public ResponseEntity getAllUsers() {
         return ResponseEntity.ok(userList);
+    }
+
+    @GetMapping("/users/{index}")
+    public ResponseEntity getUserById(@PathVariable int index) {
+        User user = new User();
+        Optional<UserPO> foundUser = userRepository.findById(index);
+        if (foundUser.isPresent()) {
+            UserPO userPO = foundUser.get();
+            user.setUserName(userPO.getUserName());
+            user.setGender(userPO.getGender());
+            user.setAge(userPO.getAge());
+            user.setEmail(userPO.getEmail());
+            user.setPhone(userPO.getPhone());
+            return ResponseEntity.ok(user);
+        }
+        throw new IllegalArgumentException();
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

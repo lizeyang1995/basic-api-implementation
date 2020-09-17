@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -131,5 +132,17 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error", is("invalid user")));
 
+    }
+
+    @Test
+    @Order(8)
+    public void should_return_user_information_when_given_id() throws Exception {
+        mockMvc.perform(get("/users/1"))
+                .andExpect(jsonPath("$.user_name", is("lize")))
+                .andExpect(jsonPath("$.user_gender", is("male")))
+                .andExpect(jsonPath("$.user_age", is(18)))
+                .andExpect(jsonPath("$.user_email", is("a@b.com")))
+                .andExpect(jsonPath("$.user_phone", is("10000000000")))
+                .andExpect(status().isOk());
     }
 }

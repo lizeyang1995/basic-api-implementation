@@ -73,7 +73,7 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     public void should_add_rs_event_when_user_not_exist() throws Exception {
         String jsonString = "{\"eventName\":\"猪肉涨价了\", \"keyWord\":\"经济\", \"userId\":100}";
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
@@ -81,7 +81,7 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     public void should_modify_rs_event_when_provide_event_name() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         User user = new User("lize", "male", 18, "a@b.com", "10000000000");
@@ -104,7 +104,7 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     public void should_modify_rs_event_when_provide_key_word() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         User user = new User("lize", "male", 18, "a@b.com", "10000000000");
@@ -127,7 +127,7 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     public void should_modify_rs_event_when_provide_key_word_and_event_name() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         User user = new User("lize", "male", 18, "a@b.com", "10000000000");
@@ -150,7 +150,7 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     public void should_delete_rs_event() throws Exception {
         mockMvc.perform(delete("/rs/list/4"))
                 .andExpect(status().isCreated());
@@ -167,7 +167,7 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     public void should_not_add_user_in_user_list_if_user_name_exists() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         User user = new User("lize", "male", 18, "a@b.com", "10000000000");
@@ -186,7 +186,7 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     public void event_name_should_not_null() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         User user = new User("lize", "male", 18, "a@b.com", "10000000000");
@@ -197,7 +197,7 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(10)
+    @Order(11)
     public void key_word_should_not_null() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         User user = new User("lize", "male", 18, "a@b.com", "10000000000");
@@ -208,7 +208,7 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(11)
+    @Order(12)
     public void should_not_include_user_field_in_rs_index() throws Exception {
         mockMvc.perform(get("/rs/1"))
                 .andExpect(jsonPath("$.eventName", is("第一条事件")))
@@ -217,7 +217,7 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(12)
+    @Order(13)
     public void should_throw_when_start_or_end_out_of_range() throws Exception {
         mockMvc.perform(get("/rs/list?start=0&end=2"))
                 .andExpect(status().isBadRequest())
@@ -226,7 +226,7 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(13)
+    @Order(14)
     public void should_not_include_user_field_in_rs_list() throws Exception {
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
@@ -235,7 +235,7 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(14)
+    @Order(15)
     public void should_throw_when_rs_index_out_of_range() throws Exception {
         mockMvc.perform(get("/rs/0"))
                 .andExpect(status().isBadRequest())
@@ -243,7 +243,7 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(15)
+    @Order(16)
     public void should_throw_when_method_argument_invalid() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         User user = new User("lizezzzzz", "male", 18, "a@b.com", "10000000000");
