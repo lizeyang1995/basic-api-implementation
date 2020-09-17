@@ -137,11 +137,11 @@ public class UserControllerTest {
     @Order(8)
     public void should_return_user_information_when_given_id() throws Exception {
         mockMvc.perform(get("/users/1"))
-                .andExpect(jsonPath("$.user_name", is("lize")))
-                .andExpect(jsonPath("$.user_gender", is("male")))
-                .andExpect(jsonPath("$.user_age", is(18)))
-                .andExpect(jsonPath("$.user_email", is("a@b.com")))
-                .andExpect(jsonPath("$.user_phone", is("10000000000")))
+                .andExpect(jsonPath("$.userName", is("lize")))
+                .andExpect(jsonPath("$.gender", is("male")))
+                .andExpect(jsonPath("$.age", is(18)))
+                .andExpect(jsonPath("$.email", is("a@b.com")))
+                .andExpect(jsonPath("$.phone", is("10000000000")))
                 .andExpect(status().isOk());
     }
 

@@ -53,21 +53,16 @@ public class UserController {
 
     @GetMapping("/users")
     public ResponseEntity getAllUsers() {
+
         return ResponseEntity.ok(userList);
     }
 
     @GetMapping("/users/{index}")
     public ResponseEntity getUserById(@PathVariable int index) {
-        User user = new User();
         Optional<UserPO> foundUser = userRepository.findById(index);
         if (foundUser.isPresent()) {
             UserPO userPO = foundUser.get();
-            user.setUserName(userPO.getUserName());
-            user.setGender(userPO.getGender());
-            user.setAge(userPO.getAge());
-            user.setEmail(userPO.getEmail());
-            user.setPhone(userPO.getPhone());
-            return ResponseEntity.ok(user);
+            return ResponseEntity.ok(userPO);
         }
         throw new IllegalArgumentException();
     }
