@@ -9,8 +9,6 @@ import java.util.List;
 public interface UserRepository extends CrudRepository<UserPO, Integer> {
     @Override
     List<UserPO> findAll();
-    @Transactional
     List<UserPO> findByUserName(String userName);
-    @Transactional
     UserPO findUserNameById(int id);
 }

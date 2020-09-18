@@ -22,6 +22,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class RsController {
@@ -47,13 +48,19 @@ public class RsController {
         return rsEventList;
     }
 
-    @GetMapping("/rs/{index}")
+    @GetMapping("/rs/{id}")
     @JsonView(RsEvent.UserInfo.class)
-    ResponseEntity getOneRsEvent(@PathVariable int index) {
-        if (index < 1 || index > rsList.size()) {
-            throw new RequestParamNotValid("invalid index");
+    ResponseEntity getOneRsEvent(@PathVariable int id) {
+        List<RsEventPO> all = rsEventRepository.findAll();
+        Optional<RsEventPO> foundRsEvent = rsEventRepository.findById(id);
+        if (foundRsEvent.isPresent()) {
+            RsEventPO rsEventPO = foundRsEvent.get();
+            RsEvent rsEvent = new RsEvent();
+            rsEvent.setEventName(rsEventPO.getEventName());
+            rsEvent.setKeyWord(rsEventPO.getKeyWord());
+            return ResponseEntity.ok(rsEvent);
         }
-        return ResponseEntity.ok(rsList.get(index - 1));
+        throw new RequestParamNotValid("invalid index");
     }
 
     @GetMapping("/rs/list")
