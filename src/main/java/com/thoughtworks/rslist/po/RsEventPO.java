@@ -20,32 +20,9 @@ public class RsEventPO {
     private int id;
     private String eventName;
     private String keyWord;
+    private int voteCount;
     @ManyToOne
     private UserPO userPO;
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "rsEventPO")
     private List<VotePO> votePOS;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getEventName() {
-        return eventName;
-    }
-
-    public void setEventName(String eventName) {
-        this.eventName = eventName;
-    }
-
-    public String getKeyWord() {
-        return keyWord;
-    }
-
-    public void setKeyWord(String keyWord) {
-        this.keyWord = keyWord;
-    }
 }

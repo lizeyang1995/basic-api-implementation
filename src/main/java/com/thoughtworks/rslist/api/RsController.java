@@ -50,6 +50,8 @@ public class RsController {
             RsEvent rsEvent = new RsEvent();
             rsEvent.setEventName(rsEventPO.getEventName());
             rsEvent.setKeyWord(rsEventPO.getKeyWord());
+            rsEvent.setVoteCount(rsEventPO.getVoteCount());
+            rsEvent.setRsEventId(rsEventPO.getId());
             return ResponseEntity.ok(rsEvent);
         }
         throw new RequestParamNotValid("invalid index");

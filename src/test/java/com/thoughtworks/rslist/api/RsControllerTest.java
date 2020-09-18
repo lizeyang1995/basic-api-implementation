@@ -56,9 +56,9 @@ public class RsControllerTest {
         userPOS.add(usrPO);
         userPOS.forEach(item -> userRepository.save(item));
 
-        rsEventPOS.add(RsEventPO.builder().eventName("第一条事件").keyWord("无标签").userPO(userPOS.get(0)).build());
-        rsEventPOS.add(RsEventPO.builder().eventName("第二条事件").keyWord("无标签").userPO(userPOS.get(0)).build());
-        rsEventPOS.add(RsEventPO.builder().eventName("第三条事件").keyWord("无标签").userPO(userPOS.get(0)).build());
+        rsEventPOS.add(RsEventPO.builder().eventName("第一条事件").keyWord("无标签").userPO(userPOS.get(0)).voteCount(0).build());
+        rsEventPOS.add(RsEventPO.builder().eventName("第二条事件").keyWord("无标签").userPO(userPOS.get(0)).voteCount(0).build());
+        rsEventPOS.add(RsEventPO.builder().eventName("第三条事件").keyWord("无标签").userPO(userPOS.get(0)).voteCount(0).build());
         rsEventPOS.forEach(item -> rsEventRepository.save(item));
     }
 
@@ -91,6 +91,9 @@ public class RsControllerTest {
     public void should_get_one_rs_event() throws Exception {
         mockMvc.perform(get("/rs/" + rsEventPOS.get(0).getId()))
                 .andExpect(jsonPath("$.eventName", is("第一条事件")))
+                .andExpect(jsonPath("$.keyWord", is("无标签")))
+                .andExpect(jsonPath("$.voteCount", is(0)))
+                .andExpect(jsonPath("$.rsEventId", is(rsEventPOS.get(0).getId())))
                 .andExpect(status().isOk());
     }
 
