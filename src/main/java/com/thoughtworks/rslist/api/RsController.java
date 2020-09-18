@@ -116,12 +116,13 @@ public class RsController {
         return ResponseEntity.created(null).build();
     }
 
-    @DeleteMapping("/rs/list/{index}")
-    ResponseEntity deleteRsEvent(@PathVariable int index) {
-        if (index < 1 || index > rsEvents.size()) {
+    @DeleteMapping("/rs/list/{id}")
+    ResponseEntity deleteRsEvent(@PathVariable int id) {
+        Optional<RsEventPO> foundRsEvent = rsEventRepository.findById(id);
+        if (!foundRsEvent.isPresent()) {
             throw new IllegalArgumentException();
         }
-        rsEvents.remove(index - 1);
+        rsEventRepository.deleteById(id);
         return ResponseEntity.created(null).build();
     }
 
