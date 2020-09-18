@@ -11,6 +11,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 @Builder
+@Data
 public class RsEvent {
     public interface UserInfo{};
     public interface UserDetail extends UserInfo{};
@@ -58,29 +59,5 @@ public class RsEvent {
     }
 
     public RsEvent() {
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public String getEventName() {
-        return eventName;
-    }
-
-    public void setEventName(String eventName) {
-        this.eventName = eventName;
-    }
-
-    public String getKeyWord() {
-        return keyWord;
-    }
-
-    public void setKeyWord(String keyWord) {
-        this.keyWord = keyWord;
     }
 }

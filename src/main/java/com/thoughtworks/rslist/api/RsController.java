@@ -64,7 +64,11 @@ public class RsController {
         List<RsEventPO> allRsEvents = rsEventRepository.findAll();
         if (start == null && end == null && allRsEvents.size() > 0) {
             for (RsEventPO rsEventPO : allRsEvents) {
-                rsEvents.add(new RsEvent(rsEventPO.getEventName(), rsEventPO.getKeyWord(), rsEventPO.getUserPO().getId()));
+                rsEvents.add(new RsEvent(rsEventPO.getEventName(),
+                        rsEventPO.getKeyWord(),
+                        rsEventPO.getUserPO().getId(),
+                        rsEventPO.getVoteCount(),
+                        rsEventPO.getId()));
             }
             return ResponseEntity.ok(rsEvents);
         } else {
@@ -72,7 +76,11 @@ public class RsController {
                 throw new RequestParamNotValid("invalid request param");
             }
             for (int i = start - 1; i < end; i++) {
-                rsEvents.add(new RsEvent(allRsEvents.get(i).getEventName(), allRsEvents.get(i).getKeyWord(), allRsEvents.get(i).getUserPO().getId()));
+                rsEvents.add(new RsEvent(allRsEvents.get(i).getEventName(),
+                        allRsEvents.get(i).getKeyWord(),
+                        allRsEvents.get(i).getUserPO().getId(),
+                        allRsEvents.get(i).getVoteCount(),
+                        allRsEvents.get(i).getId()));
             }
         }
         return ResponseEntity.ok(rsEvents);

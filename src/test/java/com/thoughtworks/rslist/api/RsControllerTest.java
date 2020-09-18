@@ -67,8 +67,12 @@ public class RsControllerTest {
         mockMvc.perform(get("/rs/list?start=1&end=2"))
                 .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
                 .andExpect(jsonPath("$[0].keyWord", is("无标签")))
+                .andExpect(jsonPath("$[0].voteCount", is(0)))
+                .andExpect(jsonPath("$[0].rsEventId", is(rsEventPOS.get(0).getId())))
                 .andExpect(jsonPath("$[1].eventName", is("第二条事件")))
                 .andExpect(jsonPath("$[1].keyWord", is("无标签")))
+                .andExpect(jsonPath("$[1].voteCount", is(0)))
+                .andExpect(jsonPath("$[1].rsEventId", is(rsEventPOS.get(1).getId())))
                 .andExpect(status().isOk());
     }
 
@@ -199,7 +203,7 @@ public class RsControllerTest {
     public void should_not_include_user_field_in_rs_list() throws Exception {
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
-                .andExpect(jsonPath("$", not(hasKey("user"))))
+                .andExpect(jsonPath("$", not(hasKey("userId"))))
                 .andExpect(status().isOk());
     }
 
