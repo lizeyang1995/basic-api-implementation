@@ -13,10 +13,8 @@ import javax.validation.constraints.NotNull;
 public class RsEvent {
     public interface UserInfo{};
     public interface UserDetail extends UserInfo{};
-    @NotNull
     @JsonView(UserInfo.class)
     private String eventName;
-    @NotNull
     @JsonView(UserInfo.class)
     private String keyWord;
     @JsonView(UserDetail.class)

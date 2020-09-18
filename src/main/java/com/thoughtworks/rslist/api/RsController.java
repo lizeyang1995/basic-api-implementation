@@ -98,15 +98,25 @@ public class RsController {
       return ResponseEntity.created(null).header("index", Integer.toString(eventIndex)).build();
   }
 
-    @PatchMapping("/rs/event/{index}")
-    ResponseEntity modifyRsEvent(@RequestBody @Valid RsEvent rsEvent, @PathVariable int index) {
-        if (index < 1 || index > rsEvents.size()) {
+    @PatchMapping("/rs/event/{id}")
+    ResponseEntity modifyRsEvent(@RequestBody @Valid RsEvent rsEvent, @PathVariable int id) {
+        if (id < 1) {
             throw new IllegalArgumentException();
         }
+        Optional<RsEventPO> foundRsEventPO = rsEventRepository.findById(id);
+        if (!foundRsEventPO.isPresent()) {
+            return ResponseEntity.badRequest().build();
+        }
+        RsEventPO rsEventPO = foundRsEventPO.get();
         String eventName = rsEvent.getEventName();
         String keyWord = rsEvent.getKeyWord();
-        rsEvents.get(index - 1).setEventName(eventName);
-        rsEvents.get(index - 1).setKeyWord(keyWord);
+        if (eventName != null) {
+            rsEventPO.setEventName(eventName);
+        }
+        if (keyWord != null) {
+            rsEventPO.setKeyWord(keyWord);
+        }
+        rsEventRepository.save(rsEventPO);
         return ResponseEntity.created(null).build();
     }
 
