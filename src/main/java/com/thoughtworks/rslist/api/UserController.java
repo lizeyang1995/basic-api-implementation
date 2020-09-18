@@ -1,6 +1,11 @@
 package com.thoughtworks.rslist.api;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.po.UserPO;
+import com.thoughtworks.rslist.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,11 +22,14 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class UserController {
     List<User> userList = initUserList();
     Logger logger = LoggerFactory.getLogger(getClass());
+    @Autowired
+    UserRepository userRepository;
 
 
     private List<User> initUserList() {
@@ -30,22 +38,57 @@ public class UserController {
     }
 
     @PostMapping("/user")
-
     ResponseEntity addUser(@RequestBody @Valid User user) {
-        userList.add(user);
-        int userIndex = userList.size() - 1;
+        UserPO userPO = new UserPO();
+        List<UserPO> foundByUserName = userRepository.findByUserName(user.getUserName());
+        if (foundByUserName.size() > 0) {
+            return ResponseEntity.badRequest().build();
+        }
+        userPO.setUserName(user.getUserName());
+        userPO.setAge(user.getAge());
+        userPO.setGender(user.getGender());
+        userPO.setEmail(user.getEmail());
+        userPO.setPhone(user.getPhone());
+        userPO.setVoteNumber(user.getVoteNumber());
+        userRepository.save(userPO);
+        int userIndex = userRepository.findAll().size() - 1;
         return ResponseEntity.created(null).header("index", Integer.toString(userIndex)).build();
     }
 
     @GetMapping("/users")
     public ResponseEntity getAllUsers() {
-        return ResponseEntity.ok(userList);
+        List<UserPO> allUsers = userRepository.findAll();
+        return ResponseEntity.ok(allUsers);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @GetMapping("/users/{index}")
+    public ResponseEntity getUserById(@PathVariable int index) {
+        Optional<UserPO> foundUser = userRepository.findById(index);
+        if (foundUser.isPresent()) {
+            UserPO userPO = foundUser.get();
+            return ResponseEntity.ok(userPO);
+        }
+        throw new IllegalArgumentException();
+    }
+
+    @DeleteMapping("/users/{index}")
+    public ResponseEntity deleteUserById(@PathVariable int index) {
+        Optional<UserPO> foundUser = userRepository.findById(index);
+        if (foundUser.isPresent()) {
+            userRepository.deleteById(index);
+            return ResponseEntity.ok(null);
+        }
+        throw new IllegalArgumentException();
+    }
+
+    @ExceptionHandler({MethodArgumentNotValidException.class, IllegalArgumentException.class})
     public ResponseEntity rsExceptionHandler(Exception paramNotValidError) {
         String errorMessage;
-        errorMessage = "invalid user";
+        if (paramNotValidError instanceof MethodArgumentNotValidException) {
+            errorMessage = "invalid user";
+        } else {
+            errorMessage = "invalid id";
+        }
         Error error = new Error();
         error.setError(errorMessage);
         logger.error(errorMessage);
