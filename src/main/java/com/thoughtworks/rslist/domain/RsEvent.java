@@ -5,11 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Builder;
+import lombok.Data;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 @Builder
+@Data
 public class RsEvent {
     public interface UserInfo{};
     public interface UserDetail extends UserInfo{};
@@ -19,7 +21,12 @@ public class RsEvent {
     private String keyWord;
     @JsonView(UserDetail.class)
     @Valid
+    @NotNull
     private int userId;
+    @JsonView(UserInfo.class)
+    private int voteCount;
+    @JsonView(UserInfo.class)
+    private int rsEventId;
 
     public RsEvent(String eventName, String keyWord, int userId) {
         this.eventName = eventName;
@@ -27,30 +34,14 @@ public class RsEvent {
         this.userId = userId;
     }
 
-    public RsEvent() {
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public String getEventName() {
-        return eventName;
-    }
-
-    public void setEventName(String eventName) {
+    public RsEvent(String eventName, String keyWord, @Valid @NotNull int userId, int voteCount, int rsEventId) {
         this.eventName = eventName;
-    }
-
-    public String getKeyWord() {
-        return keyWord;
-    }
-
-    public void setKeyWord(String keyWord) {
         this.keyWord = keyWord;
+        this.userId = userId;
+        this.voteCount = voteCount;
+        this.rsEventId = rsEventId;
+    }
+
+    public RsEvent() {
     }
 }

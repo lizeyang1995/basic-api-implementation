@@ -2,12 +2,15 @@ package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.domain.Vote;
 import com.thoughtworks.rslist.exception.Error;
 import com.thoughtworks.rslist.exception.RequestParamNotValid;
 import com.thoughtworks.rslist.po.RsEventPO;
 import com.thoughtworks.rslist.po.UserPO;
+import com.thoughtworks.rslist.po.VotePO;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
+import com.thoughtworks.rslist.repository.VoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,8 @@ public class RsController {
     RsEventRepository rsEventRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    VoteRepository voteRepository;
 
     private List<User> initUserList() {
         users = new ArrayList<>();
@@ -45,6 +50,8 @@ public class RsController {
             RsEvent rsEvent = new RsEvent();
             rsEvent.setEventName(rsEventPO.getEventName());
             rsEvent.setKeyWord(rsEventPO.getKeyWord());
+            rsEvent.setVoteCount(rsEventPO.getVoteCount());
+            rsEvent.setRsEventId(rsEventPO.getId());
             return ResponseEntity.ok(rsEvent);
         }
         throw new RequestParamNotValid("invalid index");
@@ -57,15 +64,22 @@ public class RsController {
         List<RsEventPO> allRsEvents = rsEventRepository.findAll();
         if (start == null && end == null && allRsEvents.size() > 0) {
             for (RsEventPO rsEventPO : allRsEvents) {
-                rsEvents.add(new RsEvent(rsEventPO.getEventName(), rsEventPO.getKeyWord(), rsEventPO.getUserId()));
+                rsEvents.add(new RsEvent(rsEventPO.getEventName(),
+                        rsEventPO.getKeyWord(),
+                        rsEventPO.getUserPO().getId(),
+                        rsEventPO.getVoteCount(),
+                        rsEventPO.getId()));
             }
-            return ResponseEntity.ok(rsEvents);
         } else {
             if (start < 1 || end < 1 || start > allRsEvents.size() || end > allRsEvents.size() || start > end) {
                 throw new RequestParamNotValid("invalid request param");
             }
             for (int i = start - 1; i < end; i++) {
-                rsEvents.add(new RsEvent(allRsEvents.get(i).getEventName(), allRsEvents.get(i).getKeyWord(), allRsEvents.get(i).getUserId()));
+                rsEvents.add(new RsEvent(allRsEvents.get(i).getEventName(),
+                        allRsEvents.get(i).getKeyWord(),
+                        allRsEvents.get(i).getUserPO().getId(),
+                        allRsEvents.get(i).getVoteCount(),
+                        allRsEvents.get(i).getId()));
             }
         }
         return ResponseEntity.ok(rsEvents);
@@ -74,33 +88,23 @@ public class RsController {
   @PostMapping("/rs/event")
   ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent) {
       int userId = rsEvent.getUserId();
-      if (!userRepository.findById(userId).isPresent()) {
+      Optional<UserPO> foundUserPO = userRepository.findById(userId);
+      if (!foundUserPO.isPresent()) {
           return ResponseEntity.badRequest().build();
       }
-      RsEventPO rsEventPO = RsEventPO.builder().eventName(rsEvent.getEventName()).keyWord(rsEvent.getKeyWord()).userId(userId).build();
-      UserPO newUserPO = userRepository.findUserNameById(userId);
-      List<UserPO> usersPO = userRepository.findByUserName(newUserPO.getUserName());
-      if (usersPO.size() > 1) {
-          for (UserPO userPO : usersPO) {
-              int userIdInRepository = userPO.getId();
-              if (userIdInRepository != userId) {
-                  userId = userIdInRepository;
-              }
-          }
-      }
-      rsEventPO.setUserId(userId);
+      RsEventPO rsEventPO = RsEventPO.builder().eventName(rsEvent.getEventName()).keyWord(rsEvent.getKeyWord()).userPO(foundUserPO.get()).build();
       rsEventRepository.save(rsEventPO);
       int eventIndex = rsEventRepository.findAll().size() - 1;
       return ResponseEntity.created(null).header("index", Integer.toString(eventIndex)).build();
   }
 
-    @PatchMapping("/rs/event/{id}")
+    @PatchMapping("/rs/{id}")
     ResponseEntity modifyRsEvent(@RequestBody @Valid RsEvent rsEvent, @PathVariable int id) {
         if (id < 1) {
             throw new IllegalArgumentException();
         }
         Optional<RsEventPO> foundRsEventPO = rsEventRepository.findById(id);
-        if (!foundRsEventPO.isPresent()) {
+        if (!foundRsEventPO.isPresent() || foundRsEventPO.get().getUserPO().getId() != rsEvent.getUserId()) {
             return ResponseEntity.badRequest().build();
         }
         RsEventPO rsEventPO = foundRsEventPO.get();
@@ -124,6 +128,33 @@ public class RsController {
         }
         rsEventRepository.deleteById(id);
         return ResponseEntity.created(null).build();
+    }
+
+    @PostMapping("/rs/vote/{rsEventId}")
+    ResponseEntity voting(@PathVariable int rsEventId, @RequestBody Vote vote) {
+        int userId = vote.getUserId();
+        Optional<RsEventPO> foundRsEventPO = rsEventRepository.findById(rsEventId);
+        Optional<UserPO> foundUserPO = userRepository.findById(userId);
+        if (!foundRsEventPO.isPresent()) {
+            throw new IllegalArgumentException("invalid rsEventId");
+        }
+        if (!foundUserPO.isPresent()) {
+            throw new IllegalArgumentException("invalid userId");
+        }
+        UserPO userPO = foundUserPO.get();
+        int voteNumber = userPO.getVoteNumber();
+        if (vote.getVoteNum() > voteNumber) {
+            return ResponseEntity.badRequest().build();
+        }
+        voteRepository.save(VotePO.builder()
+                            .voteNum(vote.getVoteNum())
+                            .rsEventPO(foundRsEventPO.get())
+                            .userPO(userPO)
+                            .localDate(vote.getLocalDate())
+                            .build());
+        userPO.setVoteNumber(userPO.getVoteNumber() - vote.getVoteNum());
+        userRepository.save(userPO);
+        return ResponseEntity.created(null).header("index", Integer.toString(voteRepository.findAll().size() - 1)).build();
     }
 
     @ExceptionHandler({RequestParamNotValid.class, MethodArgumentNotValidException.class})

@@ -5,6 +5,7 @@ import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.po.RsEventPO;
 import com.thoughtworks.rslist.po.UserPO;
+import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,26 +26,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserControllerTest {
 
     @Autowired
     MockMvc mockMvc;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    RsEventRepository rsEventRepository;
     List<UserPO> userPOS = new ArrayList<>();
     @BeforeEach
     public void setUp() {
         userRepository.deleteAll();
+        rsEventRepository.deleteAll();
 
         UserPO usrPO = UserPO.builder().userName("lize").gender("male").age(18).email("a@b.com").phone("10000000000").voteNumber(10).build();
         userPOS.add(usrPO);
         userPOS.forEach(item -> userRepository.save(item));
-;
     }
 
     @Test
-    @Order(1)
     public void should_add_a_user() throws Exception {
         User user = new User("lzy", "male", 18, "a@b.com", "10000000000");
         ObjectMapper objectMapper = new ObjectMapper();
@@ -63,7 +64,6 @@ public class UserControllerTest {
     }
 
     @Test
-    @Order(2)
     public void name_should_less_than_8() throws Exception {
         User user = new User("lizezzzzz", "male", 18, "a@b.com", "10000000000");
         ObjectMapper objectMapper = new ObjectMapper();
@@ -74,7 +74,6 @@ public class UserControllerTest {
     }
 
     @Test
-    @Order(3)
     public void age_should_between_18_and_100() throws Exception {
         User user = new User("lize", "male", 15, "a@b.com", "10000000000");
         ObjectMapper objectMapper = new ObjectMapper();
@@ -85,7 +84,6 @@ public class UserControllerTest {
     }
 
     @Test
-    @Order(4)
     public void phone_number_should_less_than_11() throws Exception {
         User user = new User("lize", "male", 18, "a@b.com", "100000000001");
         ObjectMapper objectMapper = new ObjectMapper();
@@ -96,7 +94,6 @@ public class UserControllerTest {
     }
 
     @Test
-    @Order(4)
     public void email_should_suit_format() throws Exception {
         User user = new User("lize", "male", 18, "ab.com", "10000000000");
         ObjectMapper objectMapper = new ObjectMapper();
@@ -107,7 +104,6 @@ public class UserControllerTest {
     }
 
     @Test
-    @Order(5)
     public void gender_should_not_null() throws Exception {
         User user = new User("lize", null, 18, "a@b.com", "10000000000");
         ObjectMapper objectMapper = new ObjectMapper();
@@ -118,7 +114,6 @@ public class UserControllerTest {
     }
 
     @Test
-    @Order(6)
     public void should_get_all_users() throws Exception {
         mockMvc.perform(get("/users"))
                 .andExpect(jsonPath("$", hasSize(1)))
@@ -131,7 +126,6 @@ public class UserControllerTest {
     }
 
     @Test
-    @Order(7)
     public void should_throw_when_user_argument_invalid() throws Exception {
         User user = new User("lizezzzzz", null, 18, "ab.com", "10000000000");
         ObjectMapper objectMapper = new ObjectMapper();
@@ -144,7 +138,6 @@ public class UserControllerTest {
     }
 
     @Test
-    @Order(8)
     public void should_return_user_information_when_given_id() throws Exception {
         int userId = userPOS.get(0).getId();
         mockMvc.perform(get("/users/" + userId))
@@ -157,19 +150,19 @@ public class UserControllerTest {
     }
 
     @Test
-    @Order(9)
     public void should_delete_user_when_given_id() throws Exception {
-        int userId = userPOS.get(0).getId();
+        UserPO userPO = userPOS.get(0);
+        int userId = userPO.getId();
+        rsEventRepository.save(RsEventPO.builder().eventName("夏天").keyWord("吃西瓜").userPO(userPO).build());
         mockMvc.perform(delete("/users/" + userId))
                 .andExpect(status().isOk());
         List<UserPO> allUser = userRepository.findAll();
+        List<RsEventPO> allRsEvents = rsEventRepository.findAll();
+        assertEquals(0, allRsEvents.size());
         assertEquals(0, allUser.size());
     }
 
-
-
     @Test
-    @Order(10)
     public void should_not_add_user_in_user_list_if_user_name_exists() throws Exception {
         User user = new User("lize", "male", 18, "a@b.com", "10000000000");
         ObjectMapper objectMapper = new ObjectMapper();
