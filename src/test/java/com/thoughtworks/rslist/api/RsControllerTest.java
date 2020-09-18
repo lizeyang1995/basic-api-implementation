@@ -3,10 +3,13 @@ package com.thoughtworks.rslist.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.domain.Vote;
 import com.thoughtworks.rslist.po.RsEventPO;
 import com.thoughtworks.rslist.po.UserPO;
+import com.thoughtworks.rslist.po.VotePO;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
+import com.thoughtworks.rslist.repository.VoteRepository;
 import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.event.annotation.BeforeTestClass;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,12 +41,16 @@ public class RsControllerTest {
     UserRepository userRepository;
     @Autowired
     RsEventRepository rsEventRepository;
+    @Autowired
+    VoteRepository voteRepository;
     List<UserPO> userPOS = new ArrayList<>();
     List<RsEventPO> rsEventPOS = new ArrayList<>();
+    List<VotePO> votePOS = new ArrayList<>();
     @BeforeEach
     public void setUp() {
         rsEventRepository.deleteAll();
         userRepository.deleteAll();
+        voteRepository.deleteAll();
 
         UserPO usrPO = UserPO.builder().userName("lize").gender("male").age(18).email("a@b.com").phone("10000000000").voteNumber(10).build();
         userPOS.add(usrPO);
@@ -213,5 +221,22 @@ public class RsControllerTest {
         mockMvc.perform(get("/rs/0"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error", is("invalid index")));
+    }
+
+    @Test
+    @Order(16)
+    void should_success_when_user_votes_enough() throws Exception {
+        LocalDateTime localDateTime = LocalDateTime.now();
+        int rsEventId = rsEventPOS.get(0).getId();
+        int userId = userPOS.get(0).getId();
+        ObjectMapper objectMapper = new ObjectMapper();
+        Vote vote = Vote.builder().userId(userId).voteNum(1).localDateTime(localDateTime).build();
+        String jsonString = objectMapper.writeValueAsString(vote);
+        List<VotePO> allVoteRecord = voteRepository.findAll();
+        mockMvc.perform(post("/rs/vote/{rsEventId}", rsEventId).content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        assertEquals(1, allVoteRecord.size());
+        assertEquals(1, allVoteRecord.get(0).getVoteNum());
+        assertEquals(userId, allVoteRecord.get(0).getUserPO().getId());
     }
 }
