@@ -45,7 +45,6 @@ public class RsControllerTest {
     VoteRepository voteRepository;
     List<UserPO> userPOS = new ArrayList<>();
     List<RsEventPO> rsEventPOS = new ArrayList<>();
-    List<VotePO> votePOS = new ArrayList<>();
     @BeforeEach
     public void setUp() {
         rsEventRepository.deleteAll();
