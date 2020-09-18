@@ -23,7 +23,7 @@ import java.util.Optional;
 
 @RestController
 public class RsController {
-    private List<RsEvent> rsEvents = initRsEvent();
+    private List<RsEvent> rsEvents;
     private List<User> users = initUserList();
     Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
@@ -34,11 +34,6 @@ public class RsController {
     private List<User> initUserList() {
         users = new ArrayList<>();
         return users;
-    }
-
-    private List<RsEvent> initRsEvent() {
-        rsEvents = new ArrayList<>();
-        return rsEvents;
     }
 
     @GetMapping("/rs/{id}")
@@ -58,6 +53,7 @@ public class RsController {
     @GetMapping("/rs/list")
     @JsonView(RsEvent.UserInfo.class)
     ResponseEntity getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
+        rsEvents = new ArrayList<>();
         List<RsEventPO> allRsEvents = rsEventRepository.findAll();
         if (start == null && end == null && allRsEvents.size() > 0) {
             for (RsEventPO rsEventPO : allRsEvents) {
@@ -94,7 +90,7 @@ public class RsController {
       }
       rsEventPO.setUserId(userId);
       rsEventRepository.save(rsEventPO);
-      int eventIndex = rsEvents.size() - 1;
+      int eventIndex = rsEventRepository.findAll().size() - 1;
       return ResponseEntity.created(null).header("index", Integer.toString(eventIndex)).build();
   }
 
