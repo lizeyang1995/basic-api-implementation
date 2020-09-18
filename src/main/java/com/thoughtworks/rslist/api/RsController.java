@@ -126,11 +126,6 @@ public class RsController {
         return ResponseEntity.created(null).build();
     }
 
-    @GetMapping("/user/list")
-    ResponseEntity getUserList() {
-        return ResponseEntity.ok(users);
-    }
-
     @ExceptionHandler({RequestParamNotValid.class, MethodArgumentNotValidException.class})
     public ResponseEntity rsExceptionHandler(Exception paramNotValidError) {
         String errorMessage;

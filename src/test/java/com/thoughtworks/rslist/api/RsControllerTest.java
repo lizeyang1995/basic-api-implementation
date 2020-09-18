@@ -219,17 +219,4 @@ public class RsControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error", is("invalid index")));
     }
-
-    @Test
-    @Order(16)
-    public void should_throw_when_method_argument_invalid() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        User user = new User("lizezzzzz", "male", 18, "a@b.com", "10000000000");
-        RsEvent rsEvent = new RsEvent("中餐", "面条", 1);
-        String jsonString = objectMapper.writeValueAsString(rsEvent);
-        mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error", is("invalid param")));
-
-    }
 }
