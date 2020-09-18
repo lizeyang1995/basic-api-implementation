@@ -70,7 +70,6 @@ public class RsController {
                         rsEventPO.getVoteCount(),
                         rsEventPO.getId()));
             }
-            return ResponseEntity.ok(rsEvents);
         } else {
             if (start < 1 || end < 1 || start > allRsEvents.size() || end > allRsEvents.size() || start > end) {
                 throw new RequestParamNotValid("invalid request param");

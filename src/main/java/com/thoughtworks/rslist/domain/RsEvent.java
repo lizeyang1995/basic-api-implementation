@@ -42,22 +42,6 @@ public class RsEvent {
         this.rsEventId = rsEventId;
     }
 
-    public int getRsEventId() {
-        return rsEventId;
-    }
-
-    public void setRsEventId(int rsEventId) {
-        this.rsEventId = rsEventId;
-    }
-
-    public int getVoteCount() {
-        return voteCount;
-    }
-
-    public void setVoteCount(int voteCount) {
-        this.voteCount = voteCount;
-    }
-
     public RsEvent() {
     }
 }
