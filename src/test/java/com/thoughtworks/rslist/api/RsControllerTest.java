@@ -116,17 +116,15 @@ public class RsControllerTest {
     @Order(6)
     public void should_modify_rs_event_when_provide_key_word() throws Exception {
         int rsEventId = rsEventPOS.get(0).getId();
+        int userId = rsEventPOS.get(0).getUserPO().getId();
         ObjectMapper objectMapper = new ObjectMapper();
-        RsEvent rsEvent = new RsEvent(null, "政策", rsEventId);
+        RsEvent rsEvent = new RsEvent(null, "政策", userId);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(patch("/rs/event/" + rsEventId).content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(get("/rs/list"))
-                .andExpect(jsonPath("$", hasSize(3)))
-                .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
-                .andExpect(jsonPath("$[0].keyWord", is("政策")))
-                .andExpect(status().isOk());
+        RsEventPO rsEventPO = rsEventRepository.findById(rsEventId).get();
+        assertEquals("政策", rsEventPO.getKeyWord());
     }
 
     @Test
