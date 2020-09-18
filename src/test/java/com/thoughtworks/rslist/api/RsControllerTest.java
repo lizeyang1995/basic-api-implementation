@@ -222,4 +222,17 @@ public class RsControllerTest {
         assertEquals(1, allVoteRecord.get(0).getVoteNum());
         assertEquals(userId, allVoteRecord.get(0).getUserPO().getId());
     }
+
+    @Test
+    void should_throw_when_user_votes_not_enough() throws Exception {
+        int rsEventId = rsEventPOS.get(0).getId();
+        int userId = userPOS.get(0).getId();
+        ObjectMapper objectMapper = new ObjectMapper();
+        Vote vote = Vote.builder().userId(userId).voteNum(11).localDate("11:11").build();
+        String jsonString = objectMapper.writeValueAsString(vote);
+        mockMvc.perform(post("/rs/vote/" + rsEventId).content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        List<VotePO> allVoteRecord = voteRepository.findAll();
+        assertEquals(0, allVoteRecord.size());
+    }
 }

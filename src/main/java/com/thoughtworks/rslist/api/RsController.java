@@ -132,12 +132,19 @@ public class RsController {
         if (!foundUserPO.isPresent()) {
             throw new IllegalArgumentException("invalid userId");
         }
+        UserPO userPO = foundUserPO.get();
+        int voteNumber = userPO.getVoteNumber();
+        if (vote.getVoteNum() > voteNumber) {
+            return ResponseEntity.badRequest().build();
+        }
         voteRepository.save(VotePO.builder()
                             .voteNum(vote.getVoteNum())
                             .rsEventPO(foundRsEventPO.get())
-                            .userPO(foundUserPO.get())
+                            .userPO(userPO)
                             .localDate(vote.getLocalDate())
                             .build());
+        userPO.setVoteNumber(userPO.getVoteNumber() - vote.getVoteNum());
+        userRepository.save(userPO);
         return ResponseEntity.created(null).header("index", Integer.toString(voteRepository.findAll().size() - 1)).build();
     }
 
