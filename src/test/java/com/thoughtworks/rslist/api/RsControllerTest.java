@@ -72,7 +72,7 @@ public class RsControllerTest {
         String jsonString = "{\"eventName\":\"猪肉涨价了\", \"keyWord\":\"经济\", \"userId\":" + savedOneUser.getId() + "}";
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("index", "2"));
+                .andExpect(header().string("index", "1"));
         List<RsEventPO> allRsEvents = rsEventRepository.findAll();
         assertNotNull(allRsEvents);
         assertEquals(4, allRsEvents.size());

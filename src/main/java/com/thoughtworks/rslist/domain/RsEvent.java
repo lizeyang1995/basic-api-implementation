@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import lombok.Builder;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+@Builder
 public class RsEvent {
     public interface UserInfo{};
     public interface UserDetail extends UserInfo{};

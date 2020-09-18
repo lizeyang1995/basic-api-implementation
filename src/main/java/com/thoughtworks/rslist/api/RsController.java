@@ -15,19 +15,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.annotation.JsonView;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 public class RsController {
-    private List<RsEvent> rsList = initRsEvent();
-    private List<User> userList = initUserList();
+    private List<RsEvent> rsEvents = initRsEvent();
+    private List<User> users = initUserList();
     Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     RsEventRepository rsEventRepository;
@@ -35,23 +32,18 @@ public class RsController {
     UserRepository userRepository;
 
     private List<User> initUserList() {
-        userList = new ArrayList<>();
-        return userList;
+        users = new ArrayList<>();
+        return users;
     }
 
     private List<RsEvent> initRsEvent() {
-        List<RsEvent> rsEventList = new ArrayList<>();
-        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
-        rsEventList.add(new RsEvent("第一条事件", "无标签", 1));
-        rsEventList.add(new RsEvent("第二条事件", "无标签", 1));
-        rsEventList.add(new RsEvent("第三条事件", "无标签", 1));
-        return rsEventList;
+        rsEvents = new ArrayList<>();
+        return rsEvents;
     }
 
     @GetMapping("/rs/{id}")
     @JsonView(RsEvent.UserInfo.class)
     ResponseEntity getOneRsEvent(@PathVariable int id) {
-        List<RsEventPO> all = rsEventRepository.findAll();
         Optional<RsEventPO> foundRsEvent = rsEventRepository.findById(id);
         if (foundRsEvent.isPresent()) {
             RsEventPO rsEventPO = foundRsEvent.get();
@@ -66,13 +58,21 @@ public class RsController {
     @GetMapping("/rs/list")
     @JsonView(RsEvent.UserInfo.class)
     ResponseEntity getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
-        if (start == null && end == null) {
-            return ResponseEntity.ok(rsList);
+        List<RsEventPO> allRsEvents = rsEventRepository.findAll();
+        if (start == null && end == null && allRsEvents.size() > 0) {
+            for (RsEventPO rsEventPO : allRsEvents) {
+                rsEvents.add(new RsEvent(rsEventPO.getEventName(), rsEventPO.getKeyWord(), rsEventPO.getUserId()));
+            }
+            return ResponseEntity.ok(rsEvents);
+        } else {
+            if (start < 1 || end < 1 || start > allRsEvents.size() || end > allRsEvents.size() || start > end) {
+                throw new RequestParamNotValid("invalid request param");
+            }
+            for (int i = start - 1; i < end; i++) {
+                rsEvents.add(new RsEvent(allRsEvents.get(i).getEventName(), allRsEvents.get(i).getKeyWord(), allRsEvents.get(i).getUserId()));
+            }
         }
-        if (start < 1 || start > rsList.size() || end < 1 || end > rsList.size()) {
-            throw new RequestParamNotValid("invalid request param");
-        }
-        return ResponseEntity.ok(rsList.subList(start - 1, end));
+        return ResponseEntity.ok(rsEvents);
     }
 
   @PostMapping("/rs/event")
@@ -94,34 +94,34 @@ public class RsController {
       }
       rsEventPO.setUserId(userId);
       rsEventRepository.save(rsEventPO);
-      int eventIndex = rsList.size() - 1;
+      int eventIndex = rsEvents.size() - 1;
       return ResponseEntity.created(null).header("index", Integer.toString(eventIndex)).build();
   }
 
     @PatchMapping("/rs/event/{index}")
     ResponseEntity modifyRsEvent(@RequestBody @Valid RsEvent rsEvent, @PathVariable int index) {
-        if (index < 1 || index > rsList.size()) {
+        if (index < 1 || index > rsEvents.size()) {
             throw new IllegalArgumentException();
         }
         String eventName = rsEvent.getEventName();
         String keyWord = rsEvent.getKeyWord();
-        rsList.get(index - 1).setEventName(eventName);
-        rsList.get(index - 1).setKeyWord(keyWord);
+        rsEvents.get(index - 1).setEventName(eventName);
+        rsEvents.get(index - 1).setKeyWord(keyWord);
         return ResponseEntity.created(null).build();
     }
 
     @DeleteMapping("/rs/list/{index}")
     ResponseEntity deleteRsEvent(@PathVariable int index) {
-        if (index < 1 || index > rsList.size()) {
+        if (index < 1 || index > rsEvents.size()) {
             throw new IllegalArgumentException();
         }
-        rsList.remove(index - 1);
+        rsEvents.remove(index - 1);
         return ResponseEntity.created(null).build();
     }
 
     @GetMapping("/user/list")
     ResponseEntity getUserList() {
-        return ResponseEntity.ok(userList);
+        return ResponseEntity.ok(users);
     }
 
     @ExceptionHandler({RequestParamNotValid.class, MethodArgumentNotValidException.class})
