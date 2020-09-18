@@ -19,7 +19,8 @@ public class RsEventPO {
     private int id;
     private String eventName;
     private String keyWord;
-    private int userId;
+    @ManyToOne
+    private UserPO userPO;
 
     public int getId() {
         return id;
@@ -43,13 +44,5 @@ public class RsEventPO {
 
     public void setKeyWord(String keyWord) {
         this.keyWord = keyWord;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
     }
 }

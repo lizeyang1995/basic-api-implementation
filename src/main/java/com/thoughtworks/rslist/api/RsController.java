@@ -57,7 +57,7 @@ public class RsController {
         List<RsEventPO> allRsEvents = rsEventRepository.findAll();
         if (start == null && end == null && allRsEvents.size() > 0) {
             for (RsEventPO rsEventPO : allRsEvents) {
-                rsEvents.add(new RsEvent(rsEventPO.getEventName(), rsEventPO.getKeyWord(), rsEventPO.getUserId()));
+                rsEvents.add(new RsEvent(rsEventPO.getEventName(), rsEventPO.getKeyWord(), rsEventPO.getUserPO().getId()));
             }
             return ResponseEntity.ok(rsEvents);
         } else {
@@ -65,7 +65,7 @@ public class RsController {
                 throw new RequestParamNotValid("invalid request param");
             }
             for (int i = start - 1; i < end; i++) {
-                rsEvents.add(new RsEvent(allRsEvents.get(i).getEventName(), allRsEvents.get(i).getKeyWord(), allRsEvents.get(i).getUserId()));
+                rsEvents.add(new RsEvent(allRsEvents.get(i).getEventName(), allRsEvents.get(i).getKeyWord(), allRsEvents.get(i).getUserPO().getId()));
             }
         }
         return ResponseEntity.ok(rsEvents);
@@ -74,10 +74,11 @@ public class RsController {
   @PostMapping("/rs/event")
   ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent) {
       int userId = rsEvent.getUserId();
-      if (!userRepository.findById(userId).isPresent()) {
+      Optional<UserPO> foundUserPO = userRepository.findById(userId);
+      if (!foundUserPO.isPresent()) {
           return ResponseEntity.badRequest().build();
       }
-      RsEventPO rsEventPO = RsEventPO.builder().eventName(rsEvent.getEventName()).keyWord(rsEvent.getKeyWord()).userId(userId).build();
+      RsEventPO rsEventPO = RsEventPO.builder().eventName(rsEvent.getEventName()).keyWord(rsEvent.getKeyWord()).userPO(foundUserPO.get()).build();
       UserPO newUserPO = userRepository.findUserNameById(userId);
       List<UserPO> usersPO = userRepository.findByUserName(newUserPO.getUserName());
       if (usersPO.size() > 1) {
@@ -88,7 +89,7 @@ public class RsController {
               }
           }
       }
-      rsEventPO.setUserId(userId);
+//      rsEventPO.setUserPO(userId);
       rsEventRepository.save(rsEventPO);
       int eventIndex = rsEventRepository.findAll().size() - 1;
       return ResponseEntity.created(null).header("index", Integer.toString(eventIndex)).build();

@@ -48,9 +48,9 @@ public class RsControllerTest {
         userPOS.add(usrPO);
         userPOS.forEach(item -> userRepository.save(item));
 
-        rsEventPOS.add(RsEventPO.builder().eventName("第一条事件").keyWord("无标签").userId(10).build());
-        rsEventPOS.add(RsEventPO.builder().eventName("第二条事件").keyWord("无标签").userId(10).build());
-        rsEventPOS.add(RsEventPO.builder().eventName("第三条事件").keyWord("无标签").userId(10).build());
+        rsEventPOS.add(RsEventPO.builder().eventName("第一条事件").keyWord("无标签").userPO(userPOS.get(0)).build());
+        rsEventPOS.add(RsEventPO.builder().eventName("第二条事件").keyWord("无标签").userPO(userPOS.get(0)).build());
+        rsEventPOS.add(RsEventPO.builder().eventName("第三条事件").keyWord("无标签").userPO(userPOS.get(0)).build());
         rsEventPOS.forEach(item -> rsEventRepository.save(item));
     }
 
@@ -78,7 +78,7 @@ public class RsControllerTest {
         assertEquals(4, allRsEvents.size());
         assertEquals("第一条事件", allRsEvents.get(0).getEventName());
         assertEquals("无标签", allRsEvents.get(0).getKeyWord());
-        assertEquals(10, allRsEvents.get(0).getUserId());
+        assertEquals(savedOneUser.getId(), allRsEvents.get(allRsEvents.size() - 1).getUserPO().getId());
     }
 
     @Test

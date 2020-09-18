@@ -162,8 +162,9 @@ public class UserControllerTest {
     @Test
     @Order(9)
     public void should_delete_user_when_given_id() throws Exception {
-        int userId = userPOS.get(0).getId();
-        rsEventRepository.save(RsEventPO.builder().eventName("夏天").keyWord("吃西瓜").userId(userId).build());
+        UserPO userPO = userPOS.get(0);
+        int userId = userPO.getId();
+        rsEventRepository.save(RsEventPO.builder().eventName("夏天").keyWord("吃西瓜").userPO(userPO).build());
         mockMvc.perform(delete("/users/" + userId))
                 .andExpect(status().isOk());
         List<UserPO> allUser = userRepository.findAll();
@@ -171,8 +172,6 @@ public class UserControllerTest {
         assertEquals(0, allRsEvents.size());
         assertEquals(0, allUser.size());
     }
-
-
 
     @Test
     @Order(10)
