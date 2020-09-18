@@ -101,17 +101,15 @@ public class RsControllerTest {
     @Order(5)
     public void should_modify_rs_event_when_provide_event_name() throws Exception {
         int rsEventId = rsEventPOS.get(0).getId();
+        int userId = rsEventPOS.get(0).getUserPO().getId();
         ObjectMapper objectMapper = new ObjectMapper();
-        RsEvent rsEvent = new RsEvent("学校放假了", null, rsEventId);
+        RsEvent rsEvent = new RsEvent("学校放假了", null, userId);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(patch("/rs/event/" + rsEventId).content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(get("/rs/list"))
-                .andExpect(jsonPath("$", hasSize(3)))
-                .andExpect(jsonPath("$[0].eventName", is("学校放假了")))
-                .andExpect(jsonPath("$[0].keyWord", is("无标签")))
-                .andExpect(status().isOk());
+        RsEventPO rsEventPO = rsEventRepository.findById(rsEventId).get();
+        assertEquals("学校放假了", rsEventPO.getEventName());
     }
 
     @Test

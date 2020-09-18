@@ -79,17 +79,6 @@ public class RsController {
           return ResponseEntity.badRequest().build();
       }
       RsEventPO rsEventPO = RsEventPO.builder().eventName(rsEvent.getEventName()).keyWord(rsEvent.getKeyWord()).userPO(foundUserPO.get()).build();
-      UserPO newUserPO = userRepository.findUserNameById(userId);
-      List<UserPO> usersPO = userRepository.findByUserName(newUserPO.getUserName());
-      if (usersPO.size() > 1) {
-          for (UserPO userPO : usersPO) {
-              int userIdInRepository = userPO.getId();
-              if (userIdInRepository != userId) {
-                  userId = userIdInRepository;
-              }
-          }
-      }
-//      rsEventPO.setUserPO(userId);
       rsEventRepository.save(rsEventPO);
       int eventIndex = rsEventRepository.findAll().size() - 1;
       return ResponseEntity.created(null).header("index", Integer.toString(eventIndex)).build();
@@ -105,6 +94,9 @@ public class RsController {
             return ResponseEntity.badRequest().build();
         }
         RsEventPO rsEventPO = foundRsEventPO.get();
+        if (rsEvent.getUserId() != rsEventPO.getUserPO().getId()) {
+            return ResponseEntity.badRequest().build();
+        }
         String eventName = rsEvent.getEventName();
         String keyWord = rsEvent.getKeyWord();
         if (eventName != null) {

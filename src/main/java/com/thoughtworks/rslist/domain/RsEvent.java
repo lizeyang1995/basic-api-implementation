@@ -19,6 +19,7 @@ public class RsEvent {
     private String keyWord;
     @JsonView(UserDetail.class)
     @Valid
+    @NotNull
     private int userId;
 
     public RsEvent(String eventName, String keyWord, int userId) {
