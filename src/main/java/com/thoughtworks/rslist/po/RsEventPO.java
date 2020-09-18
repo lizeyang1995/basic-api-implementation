@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "rsEvent")
@@ -21,6 +22,8 @@ public class RsEventPO {
     private String keyWord;
     @ManyToOne
     private UserPO userPO;
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "rsEventPO")
+    private List<VotePO> votePOS;
 
     public int getId() {
         return id;
