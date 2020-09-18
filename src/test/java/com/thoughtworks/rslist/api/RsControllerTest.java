@@ -20,6 +20,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.event.annotation.BeforeTestClass;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-//@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RsControllerTest {
 
     @Autowired
@@ -63,7 +63,6 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(1)
     public void should_get_rs_event_between_start_and_end() throws Exception {
         mockMvc.perform(get("/rs/list?start=1&end=2"))
                 .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
@@ -74,7 +73,6 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(2)
     public void should_add_rs_event_when_user_exist() throws Exception {
         UserPO savedOneUser = userRepository.save(UserPO.builder().userName("lize").gender("male").age(18).email("a@b.com").phone("10000000000").voteNumber(10).build());
         String jsonString = "{\"eventName\":\"猪肉涨价了\", \"keyWord\":\"经济\", \"userId\":" + savedOneUser.getId() + "}";
@@ -90,7 +88,6 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(3)
     public void should_get_one_rs_event() throws Exception {
         mockMvc.perform(get("/rs/" + rsEventPOS.get(0).getId()))
                 .andExpect(jsonPath("$.eventName", is("第一条事件")))
@@ -98,7 +95,6 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(4)
     public void should_add_rs_event_when_user_not_exist() throws Exception {
         String jsonString = "{\"eventName\":\"猪肉涨价了\", \"keyWord\":\"经济\", \"userId\":100}";
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
@@ -106,7 +102,6 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(5)
     public void should_modify_rs_event_when_provide_event_name() throws Exception {
         int rsEventId = rsEventPOS.get(0).getId();
         int userId = rsEventPOS.get(0).getUserPO().getId();
@@ -121,7 +116,6 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(6)
     public void should_modify_rs_event_when_provide_key_word() throws Exception {
         int rsEventId = rsEventPOS.get(0).getId();
         int userId = rsEventPOS.get(0).getUserPO().getId();
@@ -136,7 +130,6 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(7)
     public void should_modify_rs_event_when_provide_key_word_and_event_name() throws Exception {
         int rsEventId = rsEventPOS.get(0).getId();
         int userId = rsEventPOS.get(0).getUserPO().getId();
@@ -152,7 +145,6 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(8)
     public void should_delete_rs_event() throws Exception {
         int rsEventId = rsEventPOS.get(0).getId();
         mockMvc.perform(delete("/rs/list/" + rsEventId))
@@ -166,10 +158,8 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(10)
     public void event_name_should_not_null() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
         RsEvent rsEvent = new RsEvent(null, "稀饭", 1);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
@@ -177,10 +167,8 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(11)
     public void key_word_should_not_null() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
         RsEvent rsEvent = new RsEvent("早餐", null, 1);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
@@ -188,7 +176,6 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(12)
     public void should_not_include_user_field_in_rs_index() throws Exception {
         int rsEventId = rsEventPOS.get(0).getId();
         mockMvc.perform(get("/rs/" + rsEventId))
@@ -198,7 +185,6 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(13)
     public void should_throw_when_start_or_end_out_of_range() throws Exception {
         mockMvc.perform(get("/rs/list?start=0&end=2"))
                 .andExpect(status().isBadRequest())
@@ -207,7 +193,6 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(14)
     public void should_not_include_user_field_in_rs_list() throws Exception {
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
@@ -216,7 +201,6 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(15)
     public void should_throw_when_rs_index_out_of_range() throws Exception {
         mockMvc.perform(get("/rs/0"))
                 .andExpect(status().isBadRequest())
@@ -224,17 +208,16 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(16)
     void should_success_when_user_votes_enough() throws Exception {
-        LocalDateTime localDateTime = LocalDateTime.now();
         int rsEventId = rsEventPOS.get(0).getId();
         int userId = userPOS.get(0).getId();
         ObjectMapper objectMapper = new ObjectMapper();
-        Vote vote = Vote.builder().userId(userId).voteNum(1).localDateTime(localDateTime).build();
+        Vote vote = Vote.builder().userId(userId).voteNum(1).localDate("11:11").build();
         String jsonString = objectMapper.writeValueAsString(vote);
+        mockMvc.perform(post("/rs/vote/" + rsEventId).content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("index", "0"));
         List<VotePO> allVoteRecord = voteRepository.findAll();
-        mockMvc.perform(post("/rs/vote/{rsEventId}", rsEventId).content(jsonString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
         assertEquals(1, allVoteRecord.size());
         assertEquals(1, allVoteRecord.get(0).getVoteNum());
         assertEquals(userId, allVoteRecord.get(0).getUserPO().getId());

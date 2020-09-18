@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -25,5 +26,5 @@ public class VotePO {
     @ManyToOne
     @JoinColumn(name = "userId")
     private UserPO userPO;
-    private LocalDateTime localDateTime;
+    private String localDate;
 }

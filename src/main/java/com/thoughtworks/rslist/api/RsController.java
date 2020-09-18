@@ -2,12 +2,15 @@ package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.domain.Vote;
 import com.thoughtworks.rslist.exception.Error;
 import com.thoughtworks.rslist.exception.RequestParamNotValid;
 import com.thoughtworks.rslist.po.RsEventPO;
 import com.thoughtworks.rslist.po.UserPO;
+import com.thoughtworks.rslist.po.VotePO;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
+import com.thoughtworks.rslist.repository.VoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,8 @@ public class RsController {
     RsEventRepository rsEventRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    VoteRepository voteRepository;
 
     private List<User> initUserList() {
         users = new ArrayList<>();
@@ -114,6 +119,26 @@ public class RsController {
         }
         rsEventRepository.deleteById(id);
         return ResponseEntity.created(null).build();
+    }
+
+    @PostMapping("/rs/vote/{rsEventId}")
+    ResponseEntity voting(@PathVariable int rsEventId, @RequestBody Vote vote) {
+        int userId = vote.getUserId();
+        Optional<RsEventPO> foundRsEventPO = rsEventRepository.findById(rsEventId);
+        Optional<UserPO> foundUserPO = userRepository.findById(userId);
+        if (!foundRsEventPO.isPresent()) {
+            throw new IllegalArgumentException("invalid rsEventId");
+        }
+        if (!foundUserPO.isPresent()) {
+            throw new IllegalArgumentException("invalid userId");
+        }
+        voteRepository.save(VotePO.builder()
+                            .voteNum(vote.getVoteNum())
+                            .rsEventPO(foundRsEventPO.get())
+                            .userPO(foundUserPO.get())
+                            .localDate(vote.getLocalDate())
+                            .build());
+        return ResponseEntity.created(null).header("index", Integer.toString(voteRepository.findAll().size() - 1)).build();
     }
 
     @ExceptionHandler({RequestParamNotValid.class, MethodArgumentNotValidException.class})

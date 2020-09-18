@@ -1,15 +1,17 @@
 package com.thoughtworks.rslist.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-
-import java.time.LocalDateTime;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Vote {
     private int rsEventId;
     private int voteNum;
     private int userId;
-    private LocalDateTime localDateTime;
+    private String localDate;
 }
