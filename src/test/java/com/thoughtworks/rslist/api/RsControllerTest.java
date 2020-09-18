@@ -105,7 +105,7 @@ public class RsControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         RsEvent rsEvent = new RsEvent("学校放假了", null, userId);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
-        mockMvc.perform(patch("/rs/event/" + rsEventId).content(jsonString).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(patch("/rs/" + rsEventId).content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
         RsEventPO rsEventPO = rsEventRepository.findById(rsEventId).get();
@@ -120,7 +120,7 @@ public class RsControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         RsEvent rsEvent = new RsEvent(null, "政策", userId);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
-        mockMvc.perform(patch("/rs/event/" + rsEventId).content(jsonString).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(patch("/rs/" + rsEventId).content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
         RsEventPO rsEventPO = rsEventRepository.findById(rsEventId).get();
@@ -131,17 +131,16 @@ public class RsControllerTest {
     @Order(7)
     public void should_modify_rs_event_when_provide_key_word_and_event_name() throws Exception {
         int rsEventId = rsEventPOS.get(0).getId();
+        int userId = rsEventPOS.get(0).getUserPO().getId();
         ObjectMapper objectMapper = new ObjectMapper();
-        RsEvent rsEvent = new RsEvent("晚餐", "猪蹄", rsEventId);
+        RsEvent rsEvent = new RsEvent("夏天", "吃西瓜", userId);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
-        mockMvc.perform(patch("/rs/event/" + rsEventId).content(jsonString).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(patch("/rs/" + rsEventId).content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(get("/rs/list"))
-                .andExpect(jsonPath("$", hasSize(3)))
-                .andExpect(jsonPath("$[0].eventName", is("晚餐")))
-                .andExpect(jsonPath("$[0].keyWord", is("猪蹄")))
-                .andExpect(status().isOk());
+        RsEventPO rsEventPO = rsEventRepository.findById(rsEventId).get();
+        assertEquals("夏天", rsEventPO.getEventName());
+        assertEquals("吃西瓜", rsEventPO.getKeyWord());
     }
 
     @Test
