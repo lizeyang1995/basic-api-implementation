@@ -187,9 +187,10 @@ public class RsControllerTest {
     @Test
     @Order(12)
     public void should_not_include_user_field_in_rs_index() throws Exception {
-        mockMvc.perform(get("/rs/1"))
+        int rsEventId = rsEventPOS.get(0).getId();
+        mockMvc.perform(get("/rs/" + rsEventId))
                 .andExpect(jsonPath("$.eventName", is("第一条事件")))
-                .andExpect(jsonPath("$", not(hasKey("user"))))
+                .andExpect(jsonPath("$", not(hasKey("userId"))))
                 .andExpect(status().isOk());
     }
 
