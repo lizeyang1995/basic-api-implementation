@@ -1,19 +1,19 @@
 package com.thoughtworks.rslist.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.po.RsEventPO;
 import com.thoughtworks.rslist.po.UserPO;
 import com.thoughtworks.rslist.repository.UserRepository;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,19 +32,29 @@ public class UserControllerTest {
     MockMvc mockMvc;
     @Autowired
     UserRepository userRepository;
+    List<UserPO> userPOS = new ArrayList<>();
+    @BeforeEach
+    public void setUp() {
+        userRepository.deleteAll();
+
+        UserPO usrPO = UserPO.builder().userName("lize").gender("male").age(18).email("a@b.com").phone("10000000000").voteNumber(10).build();
+        userPOS.add(usrPO);
+        userPOS.forEach(item -> userRepository.save(item));
+;
+    }
 
     @Test
     @Order(1)
     public void should_add_a_user() throws Exception {
-        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
+        User user = new User("lzy", "male", 18, "a@b.com", "10000000000");
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonString = objectMapper.writeValueAsString(user);
 
         mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("index", "0"));
+                .andExpect(header().string("index", "1"));
         List<UserPO> allUsers = userRepository.findAll();
-        assertEquals(1, allUsers.size());
+        assertEquals(2, allUsers.size());
         assertEquals("lize", allUsers.get(0).getUserName());
         assertEquals("male", allUsers.get(0).getGender());
         assertEquals(18, allUsers.get(0).getAge());
@@ -136,7 +146,8 @@ public class UserControllerTest {
     @Test
     @Order(8)
     public void should_return_user_information_when_given_id() throws Exception {
-        mockMvc.perform(get("/users/1"))
+        int userId = userPOS.get(0).getId();
+        mockMvc.perform(get("/users/" + userId))
                 .andExpect(jsonPath("$.userName", is("lize")))
                 .andExpect(jsonPath("$.gender", is("male")))
                 .andExpect(jsonPath("$.age", is(18)))
@@ -148,7 +159,8 @@ public class UserControllerTest {
     @Test
     @Order(9)
     public void should_delete_user_when_given_id() throws Exception {
-        mockMvc.perform(delete("/users/1"))
+        int userId = userPOS.get(0).getId();
+        mockMvc.perform(delete("/users/" + userId))
                 .andExpect(status().isOk());
         List<UserPO> allUser = userRepository.findAll();
         assertEquals(0, allUser.size());
