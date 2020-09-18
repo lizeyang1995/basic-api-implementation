@@ -40,6 +40,10 @@ public class UserController {
     @PostMapping("/user")
     ResponseEntity addUser(@RequestBody @Valid User user) {
         UserPO userPO = new UserPO();
+        List<UserPO> foundByUserName = userRepository.findByUserName(user.getUserName());
+        if (foundByUserName.size() > 0) {
+            return ResponseEntity.badRequest().build();
+        }
         userPO.setUserName(user.getUserName());
         userPO.setAge(user.getAge());
         userPO.setGender(user.getGender());

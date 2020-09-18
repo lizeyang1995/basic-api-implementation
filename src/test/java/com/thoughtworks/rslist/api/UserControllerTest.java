@@ -165,4 +165,17 @@ public class UserControllerTest {
         List<UserPO> allUser = userRepository.findAll();
         assertEquals(0, allUser.size());
     }
+
+
+
+    @Test
+    @Order(10)
+    public void should_not_add_user_in_user_list_if_user_name_exists() throws Exception {
+        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = objectMapper.writeValueAsString(user);
+
+        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 }

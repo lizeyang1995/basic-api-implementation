@@ -163,25 +163,6 @@ public class RsControllerTest {
     }
 
     @Test
-    @Order(9)
-    public void should_not_add_user_in_user_list_if_user_name_exists() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
-        RsEvent rsEvent = new RsEvent("早餐", "稀饭", 1);
-        String jsonString = objectMapper.writeValueAsString(rsEvent);
-        mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
-        mockMvc.perform(get("/user/list"))
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].user_name", is("lize")))
-                .andExpect(jsonPath("$[0].user_gender", is("male")))
-                .andExpect(jsonPath("$[0].user_age", is(18)))
-                .andExpect(jsonPath("$[0].user_email", is("a@b.com")))
-                .andExpect(jsonPath("$[0].user_phone", is("10000000000")))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     @Order(10)
     public void event_name_should_not_null() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
