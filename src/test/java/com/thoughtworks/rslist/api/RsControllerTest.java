@@ -117,23 +117,17 @@ public class RsControllerTest {
     @Test
     @Order(6)
     public void should_modify_rs_event_when_provide_key_word() throws Exception {
+        int rsEventId = rsEventPOS.get(0).getId();
         ObjectMapper objectMapper = new ObjectMapper();
-        User user = new User("lize", "male", 18, "a@b.com", "10000000000");
-        RsEvent rsEvent = new RsEvent("学校放假了", "政策", 1);
+        RsEvent rsEvent = new RsEvent(null, "政策", rsEventId);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
-        mockMvc.perform(patch("/rs/event/4").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(patch("/rs/event/" + rsEventId).content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(get("/rs/list"))
-                .andExpect(jsonPath("$", hasSize(4)))
+                .andExpect(jsonPath("$", hasSize(3)))
                 .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
-                .andExpect(jsonPath("$[0].keyWord", is("无标签")))
-                .andExpect(jsonPath("$[1].eventName", is("第二条事件")))
-                .andExpect(jsonPath("$[1].keyWord", is("无标签")))
-                .andExpect(jsonPath("$[2].eventName", is("第三条事件")))
-                .andExpect(jsonPath("$[2].keyWord", is("无标签")))
-                .andExpect(jsonPath("$[3].eventName", is("学校放假了")))
-                .andExpect(jsonPath("$[3].keyWord", is("政策")))
+                .andExpect(jsonPath("$[0].keyWord", is("政策")))
                 .andExpect(status().isOk());
     }
 
