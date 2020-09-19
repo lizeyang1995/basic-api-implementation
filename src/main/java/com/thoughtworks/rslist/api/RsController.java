@@ -23,6 +23,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 public class RsController {
@@ -60,29 +61,25 @@ public class RsController {
     @GetMapping("/rs/list")
     @JsonView(RsEvent.UserInfo.class)
     ResponseEntity getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
-        rsEvents = new ArrayList<>();
         List<RsEventPO> allRsEvents = rsEventRepository.findAll();
-        if (start == null && end == null && allRsEvents.size() > 0) {
-            for (RsEventPO rsEventPO : allRsEvents) {
-                rsEvents.add(new RsEvent(rsEventPO.getEventName(),
-                        rsEventPO.getKeyWord(),
-                        rsEventPO.getUserPO().getId(),
-                        rsEventPO.getVoteCount(),
-                        rsEventPO.getId()));
-            }
-        } else {
-            if (start < 1 || end < 1 || start > allRsEvents.size() || end > allRsEvents.size() || start > end) {
-                throw new RequestParamNotValid("invalid request param");
-            }
-            for (int i = start - 1; i < end; i++) {
-                rsEvents.add(new RsEvent(allRsEvents.get(i).getEventName(),
-                        allRsEvents.get(i).getKeyWord(),
-                        allRsEvents.get(i).getUserPO().getId(),
-                        allRsEvents.get(i).getVoteCount(),
-                        allRsEvents.get(i).getId()));
-            }
+        rsEvents = rsEventRepository.findAll().stream()
+                .map(
+                        item ->
+                                RsEvent.builder()
+                                        .eventName(item.getEventName())
+                                        .keyWord(item.getKeyWord())
+                                        .userId(item.getUserPO().getId())
+                                        .rsEventId(item.getId())
+                                        .voteCount(item.getVoteCount())
+                                        .build())
+                .collect(Collectors.toList());
+        if (start == null && end == null) {
+            return ResponseEntity.ok(rsEvents);
         }
-        return ResponseEntity.ok(rsEvents);
+        if (start < 1 || end < 1 || start > allRsEvents.size() || end > allRsEvents.size() || start > end) {
+            throw new RequestParamNotValid("invalid request param");
+        }
+        return ResponseEntity.ok(rsEvents.subList(start - 1, end));
     }
 
   @PostMapping("/rs/event")
