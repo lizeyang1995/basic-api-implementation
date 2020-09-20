@@ -10,6 +10,7 @@ import com.thoughtworks.rslist.po.VotePO;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import com.thoughtworks.rslist.repository.VoteRepository;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
@@ -18,8 +19,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class RsService {
-    private List<RsEvent> rsEvents;
-    private List<User> users = initUserList();
     private RsEventRepository rsEventRepository;
     private UserRepository userRepository;
     private VoteRepository voteRepository;
@@ -28,14 +27,6 @@ public class RsService {
         this.rsEventRepository = rsEventRepository;
         this.userRepository = userRepository;
         this.voteRepository = voteRepository;
-    }
-
-    public RsService() {
-    }
-
-    private List<User> initUserList() {
-        users = new ArrayList<>();
-        return users;
     }
 
     public boolean vote(int rsEventId, Vote vote) {
@@ -80,7 +71,7 @@ public class RsService {
 
     public List<RsEvent> getRsEventBetween(Integer start, Integer end) {
         List<RsEventPO> allRsEvents = rsEventRepository.findAll();
-        rsEvents = rsEventRepository.findAll().stream()
+        List<RsEvent> rsEvents = rsEventRepository.findAll().stream()
                 .map(
                         item ->
                                 RsEvent.builder()
@@ -93,6 +84,9 @@ public class RsService {
                 .collect(Collectors.toList());
         if (start == null && end == null) {
             return rsEvents;
+        }
+        if (start < 1 || end < 1 || start > allRsEvents.size() || end > allRsEvents.size() || start > end) {
+            throw new RequestParamNotValid("invalid request param");
         }
         return rsEvents.subList(start - 1, end);
     }
@@ -139,5 +133,9 @@ public class RsService {
             throw new IllegalArgumentException("invalid rsEventId");
         }
         rsEventRepository.deleteById(id);
+    }
+
+    public int getVoteRepositorySize() {
+        return voteRepository.findAll().size();
     }
 }
