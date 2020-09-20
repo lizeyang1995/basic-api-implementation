@@ -140,7 +140,7 @@ public class UserControllerTest {
     @Test
     public void should_return_user_information_when_given_id() throws Exception {
         int userId = userPOS.get(0).getId();
-        mockMvc.perform(get("/users/" + userId))
+        mockMvc.perform(get("/user/" + userId))
                 .andExpect(jsonPath("$.userName", is("lize")))
                 .andExpect(jsonPath("$.gender", is("male")))
                 .andExpect(jsonPath("$.age", is(18)))
@@ -154,7 +154,7 @@ public class UserControllerTest {
         UserPO userPO = userPOS.get(0);
         int userId = userPO.getId();
         rsEventRepository.save(RsEventPO.builder().eventName("夏天").keyWord("吃西瓜").userPO(userPO).build());
-        mockMvc.perform(delete("/users/" + userId))
+        mockMvc.perform(delete("/user/" + userId))
                 .andExpect(status().isOk());
         List<UserPO> allUser = userRepository.findAll();
         List<RsEventPO> allRsEvents = rsEventRepository.findAll();
