@@ -1,6 +1,7 @@
 package com.thoughtworks.rslist.service;
 
 import com.thoughtworks.rslist.domain.RsEvent;
+import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.domain.Vote;
 import com.thoughtworks.rslist.po.RsEventPO;
 import com.thoughtworks.rslist.po.UserPO;
@@ -10,9 +11,14 @@ import com.thoughtworks.rslist.repository.UserRepository;
 import com.thoughtworks.rslist.repository.VoteRepository;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class RsService {
+    private List<RsEvent> rsEvents;
+    private List<User> users = initUserList();
     private RsEventRepository rsEventRepository;
     private UserRepository userRepository;
     private VoteRepository voteRepository;
@@ -24,6 +30,11 @@ public class RsService {
     }
 
     public RsService() {
+    }
+
+    private List<User> initUserList() {
+        users = new ArrayList<>();
+        return users;
     }
 
     public boolean vote(int rsEventId, Vote vote) {
@@ -55,5 +66,28 @@ public class RsService {
     public boolean getOneRsEvent(int id) {
         Optional<RsEventPO> foundRsEvent = rsEventRepository.findById(id);
         return foundRsEvent.isPresent();
+    }
+
+    public List<RsEvent> getRsEventBetween(Integer start, Integer end) {
+        List<RsEventPO> allRsEvents = rsEventRepository.findAll();
+        rsEvents = rsEventRepository.findAll().stream()
+                .map(
+                        item ->
+                                RsEvent.builder()
+                                        .eventName(item.getEventName())
+                                        .keyWord(item.getKeyWord())
+                                        .userId(item.getUserPO().getId())
+                                        .rsEventId(item.getId())
+                                        .voteCount(item.getVoteCount())
+                                        .build())
+                .collect(Collectors.toList());
+        if (start == null && end == null) {
+            return rsEvents;
+        }
+        return rsEvents.subList(start - 1, end);
+    }
+
+    public int getRsRepositorySize() {
+        return rsEventRepository.findAll().size();
     }
 }
