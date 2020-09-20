@@ -3,6 +3,7 @@ package com.thoughtworks.rslist.service;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.domain.Vote;
+import com.thoughtworks.rslist.exception.RequestParamNotValid;
 import com.thoughtworks.rslist.po.RsEventPO;
 import com.thoughtworks.rslist.po.UserPO;
 import com.thoughtworks.rslist.po.VotePO;
@@ -63,9 +64,18 @@ public class RsService {
         return true;
     }
 
-    public boolean getOneRsEvent(int id) {
+    public RsEvent getOneRsEvent(int id) {
         Optional<RsEventPO> foundRsEvent = rsEventRepository.findById(id);
-        return foundRsEvent.isPresent();
+        if (foundRsEvent.isPresent()) {
+            RsEventPO rsEventPO = foundRsEvent.get();
+            RsEvent rsEvent = new RsEvent();
+            rsEvent.setEventName(rsEventPO.getEventName());
+            rsEvent.setKeyWord(rsEventPO.getKeyWord());
+            rsEvent.setVoteCount(rsEventPO.getVoteCount());
+            rsEvent.setRsEventId(rsEventPO.getId());
+            return rsEvent;
+        }
+        throw new RequestParamNotValid("invalid index");
     }
 
     public List<RsEvent> getRsEventBetween(Integer start, Integer end) {
@@ -89,5 +99,16 @@ public class RsService {
 
     public int getRsRepositorySize() {
         return rsEventRepository.findAll().size();
+    }
+
+    public boolean addRsEvent(RsEvent rsEvent) {
+        int userId = rsEvent.getUserId();
+        Optional<UserPO> foundUserPO = userRepository.findById(userId);
+        if (!foundUserPO.isPresent()) {
+            return false;
+        }
+        RsEventPO rsEventPO = RsEventPO.builder().eventName(rsEvent.getEventName()).keyWord(rsEvent.getKeyWord()).userPO(foundUserPO.get()).build();
+        rsEventRepository.save(rsEventPO);
+        return true;
     }
 }
