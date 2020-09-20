@@ -132,4 +132,12 @@ public class RsService {
         rsEventRepository.save(rsEventPO);
         return true;
     }
+
+    public void deleteRsEvent(int id) {
+        Optional<RsEventPO> foundRsEvent = rsEventRepository.findById(id);
+        if (!foundRsEvent.isPresent()) {
+            throw new IllegalArgumentException("invalid rsEventId");
+        }
+        rsEventRepository.deleteById(id);
+    }
 }
