@@ -220,7 +220,7 @@ public class RsControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         Vote vote = Vote.builder().userId(userId).voteNum(1).localDate("11:11").build();
         String jsonString = objectMapper.writeValueAsString(vote);
-        mockMvc.perform(post("/rs/vote/" + rsEventId).content(jsonString).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/rs/{rsEventId}/vote", String.valueOf(rsEventId)).content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("index", "0"));
         List<VotePO> allVoteRecord = voteRepository.findAll();
@@ -236,7 +236,7 @@ public class RsControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         Vote vote = Vote.builder().userId(userId).voteNum(11).localDate("11:11").build();
         String jsonString = objectMapper.writeValueAsString(vote);
-        mockMvc.perform(post("/rs/vote/" + rsEventId).content(jsonString).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/rs/{rsEventId}/vote", String.valueOf(rsEventId)).content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
         List<VotePO> allVoteRecord = voteRepository.findAll();
         assertEquals(0, allVoteRecord.size());
