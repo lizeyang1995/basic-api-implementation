@@ -167,4 +167,12 @@ public class RsService {
         }
         throw new IllegalArgumentException("invalid userId");
     }
+
+    public void deleteUserById(int id) {
+        Optional<UserPO> foundUser = userRepository.findById(id);
+        if (foundUser.isPresent()) {
+            userRepository.deleteById(id);
+        }
+        throw new IllegalArgumentException("invalid userId");
+    }
 }
