@@ -10,10 +10,7 @@ import com.thoughtworks.rslist.po.VotePO;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import com.thoughtworks.rslist.repository.VoteRepository;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -137,5 +134,25 @@ public class RsService {
 
     public int getVoteRepositorySize() {
         return voteRepository.findAll().size();
+    }
+
+    public boolean addUser(User user) {
+        UserPO userPO = new UserPO();
+        List<UserPO> foundByUserName = userRepository.findByUserName(user.getUserName());
+        if (foundByUserName.size() > 0) {
+            return false;
+        }
+        userPO.setUserName(user.getUserName());
+        userPO.setAge(user.getAge());
+        userPO.setGender(user.getGender());
+        userPO.setEmail(user.getEmail());
+        userPO.setPhone(user.getPhone());
+        userPO.setVoteNumber(user.getVoteNumber());
+        userRepository.save(userPO);
+        return true;
+    }
+
+    public int getUserRepositorySize() {
+        return userRepository.findAll().size();
     }
 }
