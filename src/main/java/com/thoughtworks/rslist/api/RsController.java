@@ -11,6 +11,7 @@ import com.thoughtworks.rslist.po.VotePO;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import com.thoughtworks.rslist.repository.VoteRepository;
+import com.thoughtworks.rslist.service.RsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,16 +31,21 @@ public class RsController {
     private List<RsEvent> rsEvents;
     private List<User> users = initUserList();
     Logger logger = LoggerFactory.getLogger(getClass());
-    @Autowired
-    RsEventRepository rsEventRepository;
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    VoteRepository voteRepository;
+    final RsEventRepository rsEventRepository;
+    final UserRepository userRepository;
+    final VoteRepository voteRepository;
+    final RsService rsService;
 
     private List<User> initUserList() {
         users = new ArrayList<>();
         return users;
+    }
+
+    public RsController(RsEventRepository rsEventRepository, UserRepository userRepository, VoteRepository voteRepository, RsService rsService) {
+        this.rsEventRepository = rsEventRepository;
+        this.userRepository = userRepository;
+        this.voteRepository = voteRepository;
+        this.rsService = rsService;
     }
 
     @GetMapping("/rs/{id}")
