@@ -159,4 +159,12 @@ public class RsService {
     public List<UserPO> getAllUsers() {
         return userRepository.findAll();
     }
+
+    public UserPO getUserById(int id) {
+        Optional<UserPO> foundUser = userRepository.findById(id);
+        if (foundUser.isPresent()) {
+            return foundUser.get();
+        }
+        throw new IllegalArgumentException("invalid userId");
+    }
 }
