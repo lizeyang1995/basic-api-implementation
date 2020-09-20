@@ -17,12 +17,6 @@ import java.util.stream.Collectors;
 
 @RestController
 public class VoteController {
-    @Autowired
-    VoteRepository voteRepository;
-    @Autowired
-    RsEventRepository rsEventRepository;
-    @Autowired
-    UserRepository userRepository;
     final private RsService rsService;
 
     public VoteController(RsService rsService) {
@@ -31,15 +25,7 @@ public class VoteController {
 
     @GetMapping("/voteRecord")
     ResponseEntity getVoteRecode(@RequestParam String startTime) {
-        List<VotePO> allVotePORecode = voteRepository.findAll();
-        List<Vote> allVoteRecode = allVotePORecode.stream()
-                .filter(item -> item.getLocalDate().compareTo(startTime) >= 0)
-                .map(item -> Vote.builder()
-                        .rsEventId(item.getRsEventPO().getId())
-                        .userId(item.getUserPO().getId())
-                        .voteNum(item.getVoteNum())
-                        .build()
-        ).collect(Collectors.toList());
+        List<Vote> allVoteRecode = rsService.getVoteRecode(startTime);
         return ResponseEntity.ok(allVoteRecode);
     }
 }
