@@ -111,4 +111,25 @@ public class RsService {
         rsEventRepository.save(rsEventPO);
         return true;
     }
+
+    public boolean modifyRsEvent(RsEvent rsEvent, int id) {
+        if (id < 1) {
+            throw new IllegalArgumentException("invalid rsEventId");
+        }
+        Optional<RsEventPO> foundRsEventPO = rsEventRepository.findById(id);
+        if (!foundRsEventPO.isPresent() || foundRsEventPO.get().getUserPO().getId() != rsEvent.getUserId()) {
+            return false;
+        }
+        RsEventPO rsEventPO = foundRsEventPO.get();
+        String eventName = rsEvent.getEventName();
+        String keyWord = rsEvent.getKeyWord();
+        if (eventName != null) {
+            rsEventPO.setEventName(eventName);
+        }
+        if (keyWord != null) {
+            rsEventPO.setKeyWord(keyWord);
+        }
+        rsEventRepository.save(rsEventPO);
+        return true;
+    }
 }
