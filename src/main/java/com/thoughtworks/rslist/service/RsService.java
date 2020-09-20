@@ -51,4 +51,9 @@ public class RsService {
         userRepository.save(userPO);
         return true;
     }
+
+    public boolean getOneRsEvent(int id) {
+        Optional<RsEventPO> foundRsEvent = rsEventRepository.findById(id);
+        return foundRsEvent.isPresent();
+    }
 }
