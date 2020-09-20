@@ -155,4 +155,8 @@ public class RsService {
     public int getUserRepositorySize() {
         return userRepository.findAll().size();
     }
+
+    public List<UserPO> getAllUsers() {
+        return userRepository.findAll();
+    }
 }
