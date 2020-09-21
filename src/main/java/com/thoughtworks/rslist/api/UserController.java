@@ -4,6 +4,7 @@ import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.po.UserPO;
 import com.thoughtworks.rslist.repository.UserRepository;
 import com.thoughtworks.rslist.service.RsService;
+import com.thoughtworks.rslist.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,16 +23,16 @@ import java.util.Optional;
 @RestController
 public class UserController {
     Logger logger = LoggerFactory.getLogger(getClass());
-    private final RsService rsService;
+    private final UserService userService;
 
-    public UserController(RsService rsService) {
-        this.rsService = rsService;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @PostMapping("/user")
     ResponseEntity addUser(@RequestBody @Valid User user) {
-        boolean isSuccess = rsService.addUser(user);
-        int userRepositorySize = rsService.getUserRepositorySize();
+        boolean isSuccess = userService.addUser(user);
+        int userRepositorySize = userService.getUserRepositorySize();
         if (!isSuccess) {
             return ResponseEntity.badRequest().build();
         }
@@ -40,18 +41,18 @@ public class UserController {
 
     @GetMapping("/users")
     public ResponseEntity getAllUsers() {
-        return ResponseEntity.ok(rsService.getAllUsers());
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/user/{index}")
     public ResponseEntity getUserById(@PathVariable int index) {
-        UserPO userPO = rsService.getUserById(index);
+        UserPO userPO = userService.getUserById(index);
         return ResponseEntity.ok(userPO);
     }
 
     @DeleteMapping("/user/{index}")
     public ResponseEntity deleteUserById(@PathVariable int index) {
-        rsService.deleteUserById(index);
+        userService.deleteUserById(index);
         return ResponseEntity.ok(null);
     }
 

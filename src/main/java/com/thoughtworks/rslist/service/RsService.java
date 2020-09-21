@@ -136,47 +136,6 @@ public class RsService {
         return voteRepository.findAll().size();
     }
 
-    public boolean addUser(User user) {
-        UserPO userPO = new UserPO();
-        List<UserPO> foundByUserName = userRepository.findByUserName(user.getUserName());
-        if (foundByUserName.size() > 0) {
-            return false;
-        }
-        userPO.setUserName(user.getUserName());
-        userPO.setAge(user.getAge());
-        userPO.setGender(user.getGender());
-        userPO.setEmail(user.getEmail());
-        userPO.setPhone(user.getPhone());
-        userPO.setVoteNumber(user.getVoteNumber());
-        userRepository.save(userPO);
-        return true;
-    }
-
-    public int getUserRepositorySize() {
-        return userRepository.findAll().size();
-    }
-
-    public List<UserPO> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    public UserPO getUserById(int id) {
-        Optional<UserPO> foundUser = userRepository.findById(id);
-        if (foundUser.isPresent()) {
-            return foundUser.get();
-        }
-        throw new IllegalArgumentException("invalid userId");
-    }
-
-    public void deleteUserById(int id) {
-        Optional<UserPO> foundUser = userRepository.findById(id);
-        if (foundUser.isPresent()) {
-            userRepository.deleteById(id);
-            return;
-        }
-        throw new IllegalArgumentException("invalid userId");
-    }
-
     public List<Vote> getVoteRecode(String startTime) {
         List<VotePO> allVotePORecode = voteRepository.findAll();
         return allVotePORecode.stream()
