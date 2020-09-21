@@ -58,17 +58,15 @@ public class VoteControllerTest {
     }
 
     @Test
-    void should_get_vote_record_when_given_start_time() throws Exception {
-        mockMvc.perform(get("/voteRecord").param("startTime", "2020-1-1"))
-                .andExpect(jsonPath("$", hasSize(3)))
+    void should_get_vote_record_when_given_start_time_and_end_time() throws Exception {
+        mockMvc.perform(get("/voteRecord").param("startTime", "2020-1-1").param("endTime", "2020-1-2"))
+                .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].userId", is(userPOS.get(0).getId())))
                 .andExpect(jsonPath("$[0].rsEventId", is(rsEventPOS.get(0).getId())))
                 .andExpect(jsonPath("$[0].voteNum", is(votePOS.get(0).getVoteNum())))
                 .andExpect(jsonPath("$[1].userId", is(userPOS.get(0).getId())))
                 .andExpect(jsonPath("$[1].rsEventId", is(rsEventPOS.get(1).getId())))
                 .andExpect(jsonPath("$[1].voteNum", is(votePOS.get(1).getVoteNum())))
-                .andExpect(jsonPath("$[2].userId", is(userPOS.get(0).getId())))
-                .andExpect(jsonPath("$[2].rsEventId", is(rsEventPOS.get(2).getId())))
-                .andExpect(jsonPath("$[2].voteNum", is(votePOS.get(2).getVoteNum())));
+                .andExpect(status().isOk());
     }
 }

@@ -24,8 +24,8 @@ public class VoteController {
     }
 
     @GetMapping("/voteRecord")
-    ResponseEntity getVoteRecode(@RequestParam String startTime) {
-        List<Vote> allVoteRecode = rsService.getVoteRecode(startTime);
+    ResponseEntity getVoteRecode(@RequestParam String startTime, @RequestParam String endTime) {
+        List<Vote> allVoteRecode = rsService.getVoteRecode(startTime, endTime);
         return ResponseEntity.ok(allVoteRecode);
     }
 }
