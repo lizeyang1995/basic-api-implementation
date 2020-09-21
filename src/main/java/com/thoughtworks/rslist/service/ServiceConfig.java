@@ -28,4 +28,9 @@ public class ServiceConfig {
     public UserService userService() {
         return new UserService(userRepository);
     }
+
+    @Bean
+    public VoteService voteService() {
+        return new VoteService(voteRepository);
+    }
 }

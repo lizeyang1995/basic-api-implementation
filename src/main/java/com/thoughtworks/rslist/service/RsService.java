@@ -135,16 +135,4 @@ public class RsService {
     public int getVoteRepositorySize() {
         return voteRepository.findAll().size();
     }
-
-    public List<Vote> getVoteRecode(String startTime) {
-        List<VotePO> allVotePORecode = voteRepository.findAll();
-        return allVotePORecode.stream()
-                .filter(item -> item.getLocalDate().compareTo(startTime) >= 0)
-                .map(item -> Vote.builder()
-                        .rsEventId(item.getRsEventPO().getId())
-                        .userId(item.getUserPO().getId())
-                        .voteNum(item.getVoteNum())
-                        .build()
-                ).collect(Collectors.toList());
-    }
 }
