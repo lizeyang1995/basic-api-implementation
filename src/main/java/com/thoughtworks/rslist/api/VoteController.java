@@ -25,10 +25,10 @@ public class VoteController {
     UserRepository userRepository;
 
     @GetMapping("/voteRecord")
-    ResponseEntity getVoteRecode(@RequestParam String startTime) {
+    ResponseEntity getVoteRecode(@RequestParam String startTime, @RequestParam String endTime) {
         List<VotePO> allVotePORecode = voteRepository.findAll();
         List<Vote> allVoteRecode = allVotePORecode.stream()
-                .filter(item -> item.getLocalDate().compareTo(startTime) >= 0)
+                .filter(item -> item.getLocalDate().compareTo(startTime) >= 0 && item.getLocalDate().compareTo(endTime) <= 0)
                 .map(item -> Vote.builder()
                         .rsEventId(item.getRsEventPO().getId())
                         .userId(item.getUserPO().getId())
