@@ -8,12 +8,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class RsServiceConfig {
+public class ServiceConfig {
     private final RsEventRepository rsEventRepository;
     private final UserRepository userRepository;
     private final VoteRepository voteRepository;
 
-    public RsServiceConfig(RsEventRepository rsEventRepository, UserRepository userRepository, VoteRepository voteRepository) {
+    public ServiceConfig(RsEventRepository rsEventRepository, UserRepository userRepository, VoteRepository voteRepository) {
         this.rsEventRepository = rsEventRepository;
         this.userRepository = userRepository;
         this.voteRepository = voteRepository;
@@ -22,5 +22,15 @@ public class RsServiceConfig {
     @Bean
     public RsService rsService() {
         return new RsService(rsEventRepository, userRepository, voteRepository);
+    }
+
+    @Bean
+    public UserService userService() {
+        return new UserService(userRepository);
+    }
+
+    @Bean
+    public VoteService voteService() {
+        return new VoteService(voteRepository);
     }
 }
