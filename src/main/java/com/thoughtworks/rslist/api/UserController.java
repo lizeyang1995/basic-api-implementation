@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin
 public class UserController {
     Logger logger = LoggerFactory.getLogger(getClass());
     private final UserService userService;
